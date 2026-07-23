@@ -240,13 +240,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .sb-ok{background:var(--accent);color:white;}
 .sb-ca{background:var(--card2);color:var(--text2);}
 
-/* ── Leaflet dark overrides ── */
-.leaflet-tile{filter:brightness(.9) saturate(.8);}
-.leaflet-control-zoom a{background:var(--card)!important;color:var(--text)!important;border-color:var(--border2)!important;}
-.leaflet-popup-content-wrapper{background:var(--card2)!important;color:var(--text)!important;border:1px solid var(--border2)!important;border-radius:12px!important;}
-.leaflet-popup-tip{background:var(--card2)!important;}
-.route-lbl{background:rgba(10,15,30,.88)!important;color:#4a9eff!important;border:none!important;border-radius:8px!important;font-size:10px!important;font-weight:700!important;padding:3px 7px!important;}
+/* ── Leaflet map overrides ── */
+.leaflet-tile{filter:none;}
+.leaflet-control-zoom{box-shadow:0 2px 8px rgba(0,0,0,.2)!important;}
+.leaflet-control-zoom a{background:white!important;color:#333!important;border-color:#ccc!important;font-weight:700!important;}
+.leaflet-popup-content-wrapper{background:white!important;color:#222!important;border:none!important;border-radius:12px!important;box-shadow:0 4px 16px rgba(0,0,0,.18)!important;}
+.leaflet-popup-tip{background:white!important;}
+.route-lbl{background:white!important;color:#1a73e8!important;border:1.5px solid #1a73e8!important;border-radius:8px!important;font-size:11px!important;font-weight:800!important;padding:3px 8px!important;box-shadow:0 2px 6px rgba(0,0,0,.15)!important;}
 .route-lbl::before{display:none!important;}
+/* total time bar */
+#map-total-bar{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:white;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700;color:#222;box-shadow:0 2px 10px rgba(0,0,0,.18);z-index:500;white-space:nowrap;border:1.5px solid #e8e8e8;pointer-events:none;display:none;}
 
 /* ── Lock Screen ── */
 .lock-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;padding-top:calc(var(--safe-top)+32px);padding-bottom:calc(var(--safe-bot)+32px);}
@@ -274,49 +277,7 @@ select.fi option{background:var(--bg2);color:var(--text);}
 </head>
 <body>
 
-<!-- ══════════════════════════════════
-     LOCK SCREEN
-══════════════════════════════════ -->
-<div id="lock-screen" class="lock-screen">
-  <!-- Setup mode (first run) -->
-  <div id="lock-setup" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:280px">
-    <div class="lock-logo">🔐</div>
-    <div class="lock-title">비밀번호 설정</div>
-    <div class="lock-sub">처음 사용 시 4자리 PIN을 설정하세요.<br>Face ID도 함께 사용할 수 있습니다.</div>
-    <div class="lock-pin-dots" id="setup-dots">
-      <div class="pin-dot" id="sd0"></div><div class="pin-dot" id="sd1"></div>
-      <div class="pin-dot" id="sd2"></div><div class="pin-dot" id="sd3"></div>
-    </div>
-    <div class="lock-err" id="setup-err"></div>
-    <div class="pin-numpad" id="setup-pad"></div>
-    <div class="lock-hint">4자리 숫자를 입력하세요</div>
-  </div>
-
-  <!-- Login mode -->
-  <div id="lock-login" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:280px">
-    <div class="lock-logo">🗂️</div>
-    <div class="lock-title">사장님 수행 가이드</div>
-    <div class="lock-sub" id="lock-sub-msg">PIN을 입력하거나<br>Face ID로 잠금 해제하세요</div>
-    <div class="lock-pin-dots" id="login-dots">
-      <div class="pin-dot" id="ld0"></div><div class="pin-dot" id="ld1"></div>
-      <div class="pin-dot" id="ld2"></div><div class="pin-dot" id="ld3"></div>
-    </div>
-    <div class="lock-err" id="login-err"></div>
-    <div class="pin-numpad" id="login-pad"></div>
-    <button class="faceid-btn" id="faceid-btn" onclick="tryFaceID()" style="display:none">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-        <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
-        <circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/>
-        <path d="M9 15s1 1.5 3 1.5 3-1.5 3-1.5"/>
-        <path d="M12 7v1M12 15v2"/>
-      </svg>
-      Face ID로 열기
-    </button>
-    <div class="lock-hint" id="lock-attempt-hint"></div>
-  </div>
-</div>
-
-<div class="app" id="main-app" style="display:none">
+<div class="app" id="main-app" style="display:flex">
 
 <!-- HEADER -->
 <div class="hdr">
@@ -474,6 +435,7 @@ select.fi option{background:var(--bg2);color:var(--text);}
       <div class="map-wrap">
         <div id="mapEl"></div>
         <div class="map-loading-m" id="map-loading">🛣️ 도로 경로 계산 중...</div>
+        <div id="map-total-bar">🕐 총 소요시간 계산 중...</div>
       </div>
     </div>
   </div>
@@ -503,9 +465,7 @@ select.fi option{background:var(--bg2);color:var(--text);}
         <button onclick="clearSave()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--red);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:8px">
           🗑️ 저장 데이터 초기화
         </button>
-        <button onclick="changePIN()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer">
-          🔐 PIN 번호 변경
-        </button>
+
       </div>
     </div>
   </div>
@@ -716,7 +676,8 @@ var cafes=[
   {id:'district',name:'District Café',icon:'🥐',type:'브런치·카페',addr:'10160 116 St NW, Edmonton',open:'08:00',close:'16:00',closedDays:[],lat:53.5497,lng:-113.5232,note:'주청사 5분',parking:{type:'street',detail:'116 St 노상주차 가능. 주거지역 비교적 여유.'},desc:'주청사 인근 비즈니스 카페. 시나몬번·샌드위치.',img:IMGS.district},
   {id:'credo',name:'Credo Coffee',icon:'☕',type:'로컬 로스터',addr:'10359 82 Ave NW, Edmonton',open:'07:00',close:'18:00',closedDays:[],lat:53.5203,lng:-113.4959,note:'Whyte Ave',parking:{type:'street',detail:'82 Ave 노상주차. 평일 낮 여유.'},desc:'에드먼턴 로컬 로스터. 자연광 미니멀 인테리어.',img:IMGS.credo},
   {id:'transcend',name:'Transcend Coffee',icon:'✨',type:'스페셜티 #1',addr:'8708 109 St NW, Edmonton',open:'07:00',close:'19:00',closedDays:[],lat:53.5247,lng:-113.5056,note:'Garneau',parking:{type:'street',detail:'Garneau 주거지역 노상무료.'},desc:'에드먼턴 #1 스페셜티 로스터. 싱글오리진 pour-over.',img:IMGS.transcend},
-  {id:'iconoclast',name:'Iconoclast Coffee',icon:'⚗️',type:'온사이트 로스터',addr:'10407 Jasper Ave NW, Edmonton',open:'07:30',close:'17:00',closedDays:[],lat:53.5458,lng:-113.4913,note:'다운타운',parking:{type:'paid',detail:'전용 없음. 인근 Impark 유료.'},desc:'다운타운 온사이트 로스팅. 뉴욕 감성.',img:IMGS.iconoclast}
+  {id:'iconoclast',name:'Iconoclast Coffee',icon:'⚗️',type:'온사이트 로스터',addr:'10407 Jasper Ave NW, Edmonton',open:'07:30',close:'17:00',closedDays:[],lat:53.5458,lng:-113.4913,note:'다운타운',parking:{type:'paid',detail:'전용 없음. 인근 Impark 유료.'},desc:'다운타운 온사이트 로스팅. 뉴욕 감성.',img:IMGS.iconoclast},
+  {id:'liftmelake',name:'Lift Me Up on the Lake',icon:'🏞️',type:'레이크사이드 카페',addr:'Heritage Lake, Spruce Grove, AB',open:'08:00',close:'17:00',closedDays:[1],lat:53.5204,lng:-113.9119,note:'스프루스 그로브',parking:{type:'free',detail:'레이크 전용 무료 주차장.'},desc:'헤리티지 레이크 호수변 감성 카페. 아름다운 레이크뷰. 여유로운 브런치 & 스페셜티 커피.',img:null}
 ];
 
 var addrBook=[
@@ -1129,8 +1090,10 @@ var tileLayers={
 var curLayer='osm';
 
 function initMap(){
-  leafletMap=L.map('mapEl',{zoomControl:true,attributionControl:false}).setView([52.2,-113.75],6);
+  leafletMap=L.map('mapEl',{zoomControl:true,attributionControl:false,preferCanvas:true}).setView([52.9,-113.65],7);
   tileLayers.osm.addTo(leafletMap);
+  // style zoom control position
+  leafletMap.zoomControl.setPosition('bottomright');
 }
 function setLayer(n,btn){
   if(leafletMap.hasLayer(tileLayers[curLayer]))leafletMap.removeLayer(tileLayers[curLayer]);
@@ -1142,71 +1105,121 @@ function clearMap(){
   mapMarkers.forEach(function(m){leafletMap.removeLayer(m);});mapMarkers=[];
   routeLines.forEach(function(l){leafletMap.removeLayer(l);});routeLines=[];
 }
+// Route segment colors matching stop colors
+var SEG_COLS=['#EA4335','#1a73e8','#34A853','#FBBC04','#9C27B0','#EA4335'];
+
 function osrmSeg(a,b,col){
   var url='https://router.project-osrm.org/route/v1/driving/'+a.lng+','+a.lat+';'+b.lng+','+b.lat+'?overview=full&geometries=geojson';
   return fetch(url).then(function(r){return r.json();}).then(function(data){
     if(!data.routes||!data.routes[0])return null;
     var coords=data.routes[0].geometry.coordinates.map(function(c){return L.latLng(c[1],c[0]);});
-    var pl=L.polyline(coords,{color:col,weight:3.5,opacity:.9}).addTo(leafletMap);
     var km=Math.round(data.routes[0].distance/1000),min=Math.round(data.routes[0].duration/60);
+    // Draw white outline then colored line (Google Maps style)
+    var outline=L.polyline(coords,{color:'white',weight:9,opacity:.9}).addTo(leafletMap);
+    var pl=L.polyline(coords,{color:col,weight:6,opacity:1}).addTo(leafletMap);
     var mid=coords[Math.floor(coords.length/2)];
-    var lbl=L.tooltip({permanent:true,direction:'top',className:'route-lbl',opacity:.9}).setContent(km+'km·'+min+'분').setLatLng(mid);
-    leafletMap.addLayer(lbl);routeLines.push(pl);routeLines.push(lbl);return pl;
+    var lbl=L.tooltip({permanent:true,direction:'top',className:'route-lbl',opacity:1}).setContent(km+'km · '+min+'분').setLatLng(mid);
+    leafletMap.addLayer(lbl);
+    routeLines.push(outline);routeLines.push(pl);routeLines.push(lbl);
+    return {pl:pl,km:km,min:min};
   }).catch(function(){return null;});
 }
 function drawStraight(a,b,col,dash){
-  var pl=L.polyline([[a.lat,a.lng],[b.lat,b.lng]],{color:col,weight:3,dashArray:dash?'10,6':null,opacity:.7}).addTo(leafletMap);
-  routeLines.push(pl);
+  var outline=L.polyline([[a.lat,a.lng],[b.lat,b.lng]],{color:'white',weight:8,opacity:.8}).addTo(leafletMap);
+  var pl=L.polyline([[a.lat,a.lng],[b.lat,b.lng]],{color:col,weight:5,dashArray:dash?'12,7':null,opacity:.9}).addTo(leafletMap);
+  routeLines.push(outline);routeLines.push(pl);
+}
+function updateTotalBar(totalMin,totalKm){
+  var bar=document.getElementById('map-total-bar');if(!bar)return;
+  if(!totalMin){bar.style.display='none';return;}
+  var h=Math.floor(totalMin/60),m=totalMin%60;
+  var dur=h>0?(h+'시간 '+m+'분'):(m+'분');
+  bar.textContent='🗺️ 총 이동 '+dur+' · '+totalKm+'km';
+  bar.style.display='block';
 }
 function updateMap(){
   if(!leafletMap)return;
   clearMap();
-  var catCols={korean:'#e74c3c',japanese:'#e87020',chinese:'#f1c40f',western:'#4a9eff'};
+  var bar=document.getElementById('map-total-bar');if(bar)bar.style.display='none';
+
+  // POI markers (small circles for non-route places)
+  var catCols={korean:'#EA4335',japanese:'#FF6D00',chinese:'#FDD835',western:'#1a73e8'};
   var pois=[];
-  restaurants.forEach(function(r){pois.push({lat:r.lat,lng:r.lng,icon:r.icon,name:r.name,col:r.vip?'#f1c40f':(catCols[r.cat]||'#2ecc71'),sub:r.note});});
-  cafes.forEach(function(c){pois.push({lat:c.lat,lng:c.lng,icon:c.icon,name:c.name,col:'#f39c12',sub:c.note});});
-  HWY2.forEach(function(r){pois.push({lat:r.lat,lng:r.lng,icon:r.icon,name:r.name,col:'#8fa8c8',sub:r.km});});
+  restaurants.forEach(function(r){pois.push({lat:r.lat,lng:r.lng,icon:r.icon,name:r.name,col:r.vip?'#FBBC04':(catCols[r.cat]||'#34A853'),sub:r.note});});
+  cafes.forEach(function(c){pois.push({lat:c.lat,lng:c.lng,icon:c.icon,name:c.name,col:'#FF9800',sub:c.note});});
+  HWY2.forEach(function(r){pois.push({lat:r.lat,lng:r.lng,icon:r.icon,name:r.name,col:'#78909C',sub:r.km});});
   pois.forEach(function(p){
     if(!p.lat||!p.lng)return;
-    var m=L.circleMarker([p.lat,p.lng],{radius:7,fillColor:p.col,color:'rgba(255,255,255,.6)',weight:2,fillOpacity:.9})
-      .addTo(leafletMap).bindPopup('<b>'+p.icon+' '+p.name+'</b><br><small>'+(p.sub||'')+'</small>');
+    var m=L.circleMarker([p.lat,p.lng],{radius:6,fillColor:p.col,color:'white',weight:2.5,fillOpacity:.85})
+      .addTo(leafletMap).bindPopup('<b style="color:#222">'+p.icon+' '+p.name+'</b><br><small style="color:#666">'+(p.sub||'')+'</small>');
     mapMarkers.push(m);
   });
-  var seg=['#f39c12','#4a9eff','#2ecc71','#f39c12','#9b59b6','#e74c3c'];
+
+  // Route stop markers (numbered pins like Google Maps)
   stops.forEach(function(st,i){
     if(!st.lat||!st.lng)return;
-    var sz=22,icon=L.divIcon({className:'',
-      html:'<div style="background:'+st.color+';color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">'+st.icon+'</div>',
-      iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+    var sz=30;
+    var num=i+1;
+    var html='<div style="background:'+st.color+';color:white;border:2.5px solid white;border-radius:50% 50% 50% 0;width:'+sz+'px;height:'+sz+'px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;box-shadow:0 2px 8px rgba(0,0,0,.35);transform:rotate(-45deg)">'
+      +'<span style="transform:rotate(45deg)">'+st.icon+'</span></div>';
+    var icon=L.divIcon({className:'',html:html,iconSize:[sz,sz],iconAnchor:[sz/2,sz]});
     var t=S.sched[st.id]||'';
     var m=L.marker([st.lat,st.lng],{icon:icon}).addTo(leafletMap)
-      .bindPopup('<b>'+st.icon+' '+st.name+'</b>'+(t?'<br>🕐 '+t:''));
+      .bindPopup('<b style="color:#222">'+st.icon+' '+st.name+'</b>'+(t?'<br><span style="color:#1a73e8;font-weight:700">🕐 '+t+'</span>':''));
     mapMarkers.push(m);
   });
+
   var valid=stops.filter(function(s){return s.lat&&s.lng;});
   if(valid.length<2)return;
+
+  var totalMin=0,totalKm=0,pendingSegs=0;
+
+  function onSegDone(res){
+    if(res&&res.min){totalMin+=res.min;totalKm+=res.km;}
+    pendingSegs--;
+    if(pendingSegs<=0){
+      var ml2=document.getElementById('map-loading');if(ml2)ml2.style.display='none';
+      updateTotalBar(totalMin,totalKm);
+      // Fit bounds to route stops
+      var latlngs=valid.map(function(s){return [s.lat,s.lng];});
+      try{leafletMap.fitBounds(latlngs,{padding:[40,40]});}catch(e){}
+    }
+  }
+
   if(S.transport==='flight'){
     for(var i=0;i<valid.length-1;i++){
       (function(a,b,idx){
         if(a.type==='depart'&&b.type==='arrive'){
-          drawStraight(a,b,'#4a9eff',true);
+          // flight arc
+          drawStraight(a,b,'#1a73e8',true);
           var mid=L.latLng((a.lat+b.lat)/2,(a.lng+b.lng)/2);
-          var fi=L.divIcon({className:'',html:'<div style="font-size:18px;filter:drop-shadow(0 1px 3px white)">✈️</div>',iconSize:[22,22],iconAnchor:[11,11]});
+          var fi=L.divIcon({className:'',html:'<div style="font-size:20px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.4))">✈️</div>',iconSize:[24,24],iconAnchor:[12,12]});
           mapMarkers.push(L.marker(mid,{icon:fi}).addTo(leafletMap));
+          // estimate flight time ~53min
+          totalMin+=53;totalKm+=300;
+          onSegDone(null);
         } else {
-          osrmSeg(a,b,seg[idx%seg.length]).then(function(r){if(!r)drawStraight(a,b,seg[idx%seg.length],true);});
+          pendingSegs++;
+          osrmSeg(a,b,SEG_COLS[idx%SEG_COLS.length]).then(function(r){
+            if(!r)drawStraight(a,b,SEG_COLS[idx%SEG_COLS.length],false);
+            onSegDone(r);
+          });
         }
       })(valid[i],valid[i+1],i);
     }
+    // trigger done check in case all were flight
+    if(pendingSegs===0){updateTotalBar(totalMin,totalKm);}
   } else {
     var ml=document.getElementById('map-loading');if(ml)ml.style.display='block';
-    var proms=[];
+    pendingSegs=valid.length-1;
     for(var j=0;j<valid.length-1;j++){
       (function(a,b,idx){
-        proms.push(osrmSeg(a,b,seg[idx%seg.length]).then(function(r){if(!r)drawStraight(a,b,seg[idx%seg.length],true);}));
+        osrmSeg(a,b,SEG_COLS[idx%SEG_COLS.length]).then(function(r){
+          if(!r)drawStraight(a,b,SEG_COLS[idx%SEG_COLS.length],false);
+          onSegDone(r);
+        });
       })(valid[j],valid[j+1],j);
     }
-    Promise.all(proms).then(function(){var ml2=document.getElementById('map-loading');if(ml2)ml2.style.display='none';});
   }
 }
 
@@ -1228,7 +1241,7 @@ function showPage(p){
   document.getElementById('page-'+p).classList.add('active');
   document.getElementById('tab-'+p).classList.add('active');
   curPage=p;
-  if(p==='map'&&leafletMap){setTimeout(function(){leafletMap.invalidateSize();},150);}
+  if(p==='map'&&leafletMap){setTimeout(function(){leafletMap.invalidateSize();updateMap();},200);}
 }
 
 // ═══════════════════════ SHEETS ═══════════════════════
@@ -1544,11 +1557,8 @@ setTimeout(function(){
   if(loaded&&loaded!==true){
     var d=new Date(loaded);
     var ts=(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-    // Toast shown after unlock
-    lockState._restoreMsg='📂 저장된 데이터 복원 ('+ts+')';
+    setTimeout(function(){showToast('📂 저장된 데이터 복원 ('+ts+')');},600);
   }
-  // Start lock screen
-  initLock();
 },150);
 </script>
 </body>
