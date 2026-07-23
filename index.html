@@ -1,11 +1,13 @@
-<html lang="ko"><head>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0f1e">
 <title>수행 가이드</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 /* ── Reset & Base ── */
@@ -60,10 +62,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-top:1px solid var(--border2);
   padding-bottom:var(--safe-bot);
-  flex-shrink:0;z-index:20;
+  flex-shrink:0;z-index:50;
   display:flex;
+  position:relative;
 }
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;position:relative;min-height:var(--tab-h);}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;position:relative;min-height:var(--tab-h);border:none;background:none;-webkit-appearance:none;appearance:none;outline:none;font-family:inherit;}
 .tab-item:active{opacity:.7;}
 .tab-icon{font-size:22px;line-height:1;margin-bottom:3px;transition:transform .15s;}
 .tab-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.2px;}
@@ -275,7 +278,7 @@ select.fi option{background:var(--bg2);color:var(--text);}
 <!-- ══════════════════════════════════
      LOCK SCREEN
 ══════════════════════════════════ -->
-<div id="lock-screen" class="lock-screen" style="display: none;">
+<div id="lock-screen" class="lock-screen">
   <!-- Setup mode (first run) -->
   <div id="lock-setup" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:280px">
     <div class="lock-logo">🔐</div>
@@ -291,33 +294,41 @@ select.fi option{background:var(--bg2);color:var(--text);}
   </div>
 
   <!-- Login mode -->
-  <div id="lock-login" style="display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 280px;">
+  <div id="lock-login" style="display:none;flex-direction:column;align-items:center;width:100%;max-width:280px">
     <div class="lock-logo">🗂️</div>
     <div class="lock-title">사장님 수행 가이드</div>
     <div class="lock-sub" id="lock-sub-msg">PIN을 입력하거나<br>Face ID로 잠금 해제하세요</div>
     <div class="lock-pin-dots" id="login-dots">
-      <div class="pin-dot filled" id="ld0"></div><div class="pin-dot filled" id="ld1"></div>
-      <div class="pin-dot filled" id="ld2"></div><div class="pin-dot filled" id="ld3"></div>
+      <div class="pin-dot" id="ld0"></div><div class="pin-dot" id="ld1"></div>
+      <div class="pin-dot" id="ld2"></div><div class="pin-dot" id="ld3"></div>
     </div>
     <div class="lock-err" id="login-err"></div>
-    <div class="pin-numpad" id="login-pad"><button class="pin-btn">1</button><button class="pin-btn">2</button><button class="pin-btn">3</button><button class="pin-btn">4</button><button class="pin-btn">5</button><button class="pin-btn">6</button><button class="pin-btn">7</button><button class="pin-btn">8</button><button class="pin-btn">9</button><button class="pin-btn empty"></button><button class="pin-btn">0</button><button class="pin-btn del">⌫</button></div>
-    <button class="faceid-btn" id="faceid-btn" onclick="tryFaceID()" style="display: flex;">Face ID 등록</button>
+    <div class="pin-numpad" id="login-pad"></div>
+    <button class="faceid-btn" id="faceid-btn" onclick="tryFaceID()" style="display:none">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
+        <circle cx="9" cy="10" r="1"/><circle cx="15" cy="10" r="1"/>
+        <path d="M9 15s1 1.5 3 1.5 3-1.5 3-1.5"/>
+        <path d="M12 7v1M12 15v2"/>
+      </svg>
+      Face ID로 열기
+    </button>
     <div class="lock-hint" id="lock-attempt-hint"></div>
   </div>
 </div>
 
-<div class="app" id="main-app" style="display: flex;">
+<div class="app" id="main-app" style="display:none">
 
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-row">
     <div>
       <div class="hdr-title">🗂️ 사장님 수행 가이드</div>
-      <div class="hdr-sub" id="hdr-sub">7/22 (수) · Calgary → Edmonton</div>
+      <div class="hdr-sub" id="hdr-sub">날짜 선택 중...</div>
     </div>
     <div style="display:flex;gap:7px;align-items:center">
       <button onclick="saveAll()" style="background:#2ecc71;border:none;border-radius:10px;color:white;font-size:12px;font-weight:700;padding:7px 13px;cursor:pointer;-webkit-tap-highlight-color:transparent">💾 저장</button>
-      <div class="hdr-badge" id="hdr-badge">YEG 10:30</div>
+      <div class="hdr-badge" id="hdr-badge">설정중</div>
     </div>
   </div>
 </div>
@@ -326,51 +337,51 @@ select.fi option{background:var(--bg2);color:var(--text);}
 <div class="pages">
 
   <!-- ① 일정 PAGE -->
-  <div class="page" id="page-schedule">
+  <div class="page active" id="page-schedule">
     <div class="page-content">
 
       <!-- Quick info strip -->
       <div class="info-strip">
         <div class="info-chip accent">
           <div class="info-chip-lbl">YEG 도착</div>
-          <div class="info-chip-val" id="ci-arrive">10:30</div>
+          <div class="info-chip-val" id="ci-arrive">—</div>
         </div>
         <div class="info-chip">
           <div class="info-chip-lbl">식당</div>
-          <div class="info-chip-val" id="ci-rest" style="font-size:11px">ZIGLE </div>
+          <div class="info-chip-val" id="ci-rest" style="font-size:11px">미선택</div>
         </div>
         <div class="info-chip">
           <div class="info-chip-lbl">카페</div>
-          <div class="info-chip-val" id="ci-cafe" style="font-size:11px">Iconoc</div>
+          <div class="info-chip-val" id="ci-cafe" style="font-size:11px">미선택</div>
         </div>
         <div class="info-chip">
           <div class="info-chip-lbl">주청사</div>
-          <div class="info-chip-val" id="ci-legis">14:00</div>
+          <div class="info-chip-val" id="ci-legis">—</div>
         </div>
         <div class="info-chip">
           <div class="info-chip-lbl">귀환편</div>
-          <div class="info-chip-val" id="ci-ret">18:40</div>
+          <div class="info-chip-val" id="ci-ret">—</div>
         </div>
       </div>
 
       <!-- Mode & Date -->
       <div class="card-sm">
         <div class="seg" id="transport-seg">
-          <button class="seg-btn" id="tb-flight" onclick="setTransport('flight')">✈️ 비행기</button>
-          <button class="seg-btn active" id="tb-car" onclick="setTransport('car')">🚗 차량</button>
+          <button class="seg-btn active" id="tb-flight" onclick="setTransport('flight')">✈️ 비행기</button>
+          <button class="seg-btn" id="tb-car" onclick="setTransport('car')">🚗 차량</button>
         </div>
-        <div id="flight-opts" style="display: none;">
+        <div id="flight-opts">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
             <div>
               <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px">날짜</div>
-              <select class="fi" id="pk-date" onchange="onDateChange()" style="padding:10px 12px;font-size:13px;margin:0"><option value="2026-07-22">오늘(07/22 수)</option><option value="2026-07-23">내일(07/23 목)</option><option value="2026-07-24">07/24 금</option><option value="2026-07-25">07/25 토</option><option value="2026-07-26">07/26 일</option><option value="2026-07-27">07/27 월</option><option value="2026-07-28">07/28 화</option><option value="2026-07-29">07/29 수</option><option value="2026-07-30">07/30 목</option><option value="2026-07-31">07/31 금</option><option value="2026-08-01">08/01 토</option><option value="2026-08-02">08/02 일</option><option value="2026-08-03">08/03 월</option><option value="2026-08-04">08/04 화</option><option value="2026-08-05">08/05 수</option><option value="2026-08-06">08/06 목</option><option value="2026-08-07">08/07 금</option><option value="2026-08-08">08/08 토</option><option value="2026-08-09">08/09 일</option><option value="2026-08-10">08/10 월</option><option value="2026-08-11">08/11 화</option><option value="2026-08-12">08/12 수</option><option value="2026-08-13">08/13 목</option><option value="2026-08-14">08/14 금</option><option value="2026-08-15">08/15 토</option><option value="2026-08-16">08/16 일</option><option value="2026-08-17">08/17 월</option><option value="2026-08-18">08/18 화</option><option value="2026-08-19">08/19 수</option><option value="2026-08-20">08/20 목</option><option value="2026-08-21">08/21 금</option><option value="2026-08-22">08/22 토</option><option value="2026-08-23">08/23 일</option><option value="2026-08-24">08/24 월</option><option value="2026-08-25">08/25 화</option><option value="2026-08-26">08/26 수</option><option value="2026-08-27">08/27 목</option><option value="2026-08-28">08/28 금</option><option value="2026-08-29">08/29 토</option><option value="2026-08-30">08/30 일</option></select>
+              <select class="fi" id="pk-date" onchange="onDateChange()" style="padding:10px 12px;font-size:13px;margin:0"></select>
             </div>
             <div>
               <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px">항공편 YYC→YEG</div>
               <select class="fi" id="pk-flight" onchange="recalc()" style="padding:10px 12px;font-size:12px;margin:0">
                 <option value="07:00|07:53">WS100 · 07:00→07:53</option>
                 <option value="08:00|08:53">WS120 · 08:00→08:53</option>
-                <option value="09:00|09:53" selected="">WS132 · 09:00→09:53</option>
+                <option value="09:00|09:53" selected>WS132 · 09:00→09:53</option>
                 <option value="09:30|10:23">AC253 · 09:30→10:23</option>
                 <option value="11:00|11:53">WS146 · 11:00→11:53</option>
                 <option value="14:00|14:53">WS253 · 14:00→14:53</option>
@@ -381,16 +392,16 @@ select.fi option{background:var(--bg2);color:var(--text);}
             <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px">귀환편 YEG→YYC</div>
             <select class="fi" id="pk-return" onchange="recalc()" style="padding:10px 12px;font-size:13px;margin:0">
               <option value="17:00">17:00편</option>
-              <option value="18:40" selected="">18:40편</option>
+              <option value="18:40" selected>18:40편</option>
               <option value="19:30">19:30편</option>
               <option value="20:00">20:00편</option>
             </select>
           </div>
         </div>
-        <div id="car-opts" style="display: block;">
+        <div id="car-opts" style="display:none">
           <div style="margin-bottom:6px">
             <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px">날짜</div>
-            <select class="fi" id="pk-date2" onchange="S.date=this.value;syncDate();recalc()" style="padding:10px;font-size:13px;margin:0"><option value="2026-07-22">오늘(07/22 수)</option><option value="2026-07-23">내일(07/23 목)</option><option value="2026-07-24">07/24 금</option><option value="2026-07-25">07/25 토</option><option value="2026-07-26">07/26 일</option><option value="2026-07-27">07/27 월</option><option value="2026-07-28">07/28 화</option><option value="2026-07-29">07/29 수</option><option value="2026-07-30">07/30 목</option><option value="2026-07-31">07/31 금</option><option value="2026-08-01">08/01 토</option><option value="2026-08-02">08/02 일</option><option value="2026-08-03">08/03 월</option><option value="2026-08-04">08/04 화</option><option value="2026-08-05">08/05 수</option><option value="2026-08-06">08/06 목</option><option value="2026-08-07">08/07 금</option><option value="2026-08-08">08/08 토</option><option value="2026-08-09">08/09 일</option><option value="2026-08-10">08/10 월</option><option value="2026-08-11">08/11 화</option><option value="2026-08-12">08/12 수</option><option value="2026-08-13">08/13 목</option><option value="2026-08-14">08/14 금</option><option value="2026-08-15">08/15 토</option><option value="2026-08-16">08/16 일</option><option value="2026-08-17">08/17 월</option><option value="2026-08-18">08/18 화</option><option value="2026-08-19">08/19 수</option><option value="2026-08-20">08/20 목</option><option value="2026-08-21">08/21 금</option><option value="2026-08-22">08/22 토</option><option value="2026-08-23">08/23 일</option><option value="2026-08-24">08/24 월</option><option value="2026-08-25">08/25 화</option><option value="2026-08-26">08/26 수</option><option value="2026-08-27">08/27 목</option><option value="2026-08-28">08/28 금</option><option value="2026-08-29">08/29 토</option><option value="2026-08-30">08/30 일</option></select>
+            <select class="fi" id="pk-date2" onchange="S.date=this.value;syncDate();recalc()" style="padding:10px;font-size:13px;margin:0"></select>
           </div>
           <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px">출발지</div>
           <div style="display:flex;gap:6px;margin-bottom:6px">
@@ -402,13 +413,13 @@ select.fi option{background:var(--bg2);color:var(--text);}
               <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px">출발 시</div>
               <select class="fi" id="car-h" onchange="recalc()" style="padding:10px;margin:0">
                 <option value="6">06:00</option><option value="7">07:00</option>
-                <option value="8" selected="">08:00</option><option value="9">09:00</option><option value="10">10:00</option>
+                <option value="8" selected>08:00</option><option value="9">09:00</option><option value="10">10:00</option>
               </select>
             </div>
             <div>
               <div style="font-size:10px;color:var(--text3);font-weight:600;margin-bottom:4px">출발 분</div>
               <select class="fi" id="car-m" onchange="recalc()" style="padding:10px;margin:0">
-                <option value="0" selected="">:00</option><option value="10">:10</option>
+                <option value="0" selected>:00</option><option value="10">:10</option>
                 <option value="20">:20</option><option value="30">:30</option><option value="40">:40</option>
               </select>
             </div>
@@ -421,7 +432,7 @@ select.fi option{background:var(--bg2);color:var(--text);}
         <div class="sec-title">방문 경로</div>
         <button class="sec-btn" onclick="openSheet('sheet-addstop')">＋ 추가</button>
       </div>
-      <div class="timeline" id="rt-list"><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#4a9eff;box-shadow:0 0 0 3px #4a9eff30"></div><div class="tl-line" style="background:#4a9eff40"></div></div><div class="tl-body" onclick="stepTapped(0)"><div class="tl-time">10:45</div><div class="tl-name">🏢 Western Canadian Place</div><div class="tl-sub">707 8th Ave SW</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('wcp')">✏️</button><button class="tl-act" onclick="removeStop('wcp')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#4a9eff;box-shadow:0 0 0 3px #4a9eff30"></div><div class="tl-line" style="background:#4a9eff40"></div></div><div class="tl-body" onclick="stepTapped(1)"><div class="tl-time">11:15</div><div class="tl-name">📍 정진환 차장</div><div class="tl-sub">99 Spruce Place sw</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('a1784778989445')">✏️</button><button class="tl-act" onclick="removeStop('a1784778989445')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#4a9eff;box-shadow:0 0 0 3px #4a9eff30"></div><div class="tl-line" style="background:#4a9eff40"></div></div><div class="tl-body" onclick="stepTapped(2)"><div class="tl-time">11:45</div><div class="tl-name">📍 서정우 법인장님</div><div class="tl-sub">222  Riverfront Ave. SW</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('a1784779076099')">✏️</button><button class="tl-act" onclick="removeStop('a1784779076099')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#4a9eff;box-shadow:0 0 0 3px #4a9eff30"></div><div class="tl-line" style="background:#4a9eff40"></div></div><div class="tl-body" onclick="stepTapped(3)"><div class="tl-time">10:30</div><div class="tl-name">🛬 YEG 공항 도착</div><div class="tl-sub">1000 Airport Rd</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('yeg')">✏️</button><button class="tl-act" onclick="removeStop('yeg')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#2ecc71;box-shadow:0 0 0 3px #2ecc7130"></div><div class="tl-line" style="background:#2ecc7140"></div></div><div class="tl-body" onclick="stepTapped(4)"><div class="tl-time">12:15</div><div class="tl-name">🍽️ ZIGLE Korean Bulgogi</div><div class="tl-sub">800 Broadmoor Blvd #900</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('rest')">✏️</button><button class="tl-act" onclick="removeStop('rest')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#9b59b6;box-shadow:0 0 0 3px #9b59b630"></div><div class="tl-line" style="background:#9b59b640"></div></div><div class="tl-body" onclick="stepTapped(5)"><div class="tl-time">14:00</div><div class="tl-name">🏛️ 앨버타 주청사</div><div class="tl-sub">10800 97 Ave NW</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('legis')">✏️</button><button class="tl-act" onclick="removeStop('legis')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#f39c12;box-shadow:0 0 0 3px #f39c1230"></div><div class="tl-line" style="background:#f39c1240"></div></div><div class="tl-body" onclick="stepTapped(6)"><div class="tl-time">15:45</div><div class="tl-name">☕ Iconoclast Coffee</div><div class="tl-sub">10407 Jasper Ave NW</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('cafe')">✏️</button><button class="tl-act" onclick="removeStop('cafe')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#4a9eff;box-shadow:0 0 0 3px #4a9eff30"></div><div class="tl-line" style="background:#4a9eff40"></div></div><div class="tl-body" onclick="stepTapped(7)"><div class="tl-time">16:20</div><div class="tl-name">📦 픽업② Riverfront Ave</div><div class="tl-sub">222 Riverfront Ave SW</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('pk2')">✏️</button><button class="tl-act" onclick="removeStop('pk2')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div><div class="tl-item" draggable="true"><div class="tl-col"><div class="tl-dot" style="background:#4a9eff;box-shadow:0 0 0 3px #4a9eff30"></div></div><div class="tl-body" onclick="stepTapped(8)"><div class="tl-time">16:50</div><div class="tl-name">📦 픽업① Spruce Place</div><div class="tl-sub">1104-99 Spruce Pl SW</div></div><div class="tl-actions"><button class="tl-act" onclick="openEditStop('pk1')">✏️</button><button class="tl-act" onclick="removeStop('pk1')" style="color:var(--red)">✕</button></div><span class="tl-drag">⠿</span></div></div>
+      <div class="timeline" id="rt-list"></div>
     </div>
   </div>
 
@@ -433,9 +444,9 @@ select.fi option{background:var(--bg2);color:var(--text);}
         <button class="sec-btn" onclick="openSheet('sheet-addrest')">＋ 추가</button>
       </div>
       <div class="alert al-info" style="font-size:11.5px">🌞 영업전도 선택 가능(주황). 🚪프라이빗룸 🅿️주차 ★4.2+</div>
-      <div class="filter-pills" id="rest-filters"><button class="fpill active" style="border-color: rgb(231, 76, 60); color: rgb(231, 76, 60); background: rgba(231, 76, 60, 0.094);">🇰🇷 한식</button><button class="fpill">🇯🇵 일식</button><button class="fpill">🇨🇳 중식</button><button class="fpill">🍽️ 양식</button><button class="fpill">전체</button><button class="fpill">🌞 점심</button><button class="fpill">👑 VIP</button></div>
-      <div class="rest-scroll" id="rest-grid"><div class="rest-card-h warn"><img class="rest-img" src="https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400&amp;q=70" alt="ZIGLE Korean Bulgogi" onerror="this.style.display='none'"><div class="rest-body"><div class="rest-name">ZIGLE Korean Bulgogi</div><div class="rest-cuisine">한식 불고기 $$</div><div class="rest-status s-pre">⚠️ 11:30(도착전)</div><div class="rest-badges"><span class="badge b-lunch">점심</span><span class="badge b-free">🅿️ 무료주차</span></div></div></div><div class="rest-card-h eve"><img class="rest-img" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&amp;q=70" alt="Baekjeong Korean BBQ" onerror="this.style.display='none'"><div class="rest-body"><div class="rest-name">Baekjeong Korean BBQ</div><div class="rest-cuisine">한식 KBBQ $$$</div><div class="rest-status s-eve">🌙 저녁 16:30~</div><div class="rest-badges"><span class="badge b-eve">저녁</span><span class="badge b-free">🅿️ 무료주차</span></div></div></div><div class="rest-card-h"><img class="rest-img" src="https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&amp;q=70" alt="Hanjan Korean" onerror="this.style.display='none'"><div class="rest-body"><div class="rest-name">Hanjan Korean</div><div class="rest-cuisine">한식 바 $$</div><div class="rest-status s-open">✅ 11:00~</div><div class="rest-badges"><span class="badge b-lunch">점심</span><span class="badge b-paid">🅿️ 노상주차</span></div></div></div><div class="rest-card-h eve"><img class="rest-img" src="https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&amp;q=70" alt="SANG Seoul Table" onerror="this.style.display='none'"><div class="rest-body"><div class="rest-name">SANG Seoul Table</div><div class="rest-cuisine">한식 AYCE $$</div><div class="rest-status s-eve">🌙 저녁 17:00~</div><div class="rest-badges"><span class="badge b-eve">저녁</span><span class="badge b-nopark">🚫 주차없음</span></div></div></div><div class="rest-card-h"><img class="rest-img" src="https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&amp;q=70" alt="Dookbaeki Hot Stone" onerror="this.style.display='none'"><div class="rest-body"><div class="rest-name">Dookbaeki Hot Stone</div><div class="rest-cuisine">돌솥 한식 $$</div><div class="rest-status s-pre">⚠️ 11:30(도착전)</div><div class="rest-badges"><span class="badge b-lunch">점심</span><span class="badge b-free">🅿️ 무료주차</span></div></div></div></div>
-      <div id="rest-detail"><div class="detail-pane"><img class="detail-img" src="https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400&amp;q=70" alt="ZIGLE Korean Bulgogi" onerror="this.outerHTML='&lt;div class=detail-img-ph&gt;🍖&lt;/div&gt;'"><div class="detail-body"><div class="detail-name">ZIGLE Korean Bulgogi</div><div class="detail-meta">한식 불고기 · $$ · ⏰ 11:30~21:00</div><div class="detail-meta">📍 800 Broadmoor Blvd #900, Sherwood Park</div><div class="detail-desc">찌글이 원조. 에드먼턴 최고 평점(★4.9). iPad 주문. 불고기·짜글이·솥밥.</div><div class="park-pill park-pill-ok"><strong>🅿️ 무료주차</strong> — 쇼핑몰 단지 내 대형 무료 주차장. 매우 편리.</div><a class="btn btn-primary btn-sm" href="https://maps.google.com/?q=800%20Broadmoor%20Blvd%20%23900%2C%20Sherwood%20Park" target="_blank">📍 Google Maps 길 안내</a><a class="btn btn-secondary btn-sm" href="https://maps.apple.com/?q=800%20Broadmoor%20Blvd%20%23900%2C%20Sherwood%20Park" target="_blank">🍎 Apple Maps</a><a class="btn btn-green btn-sm" href="tel:+18259671140">📞 825-967-1140 예약전화</a></div></div></div>
+      <div class="filter-pills" id="rest-filters"></div>
+      <div class="rest-scroll" id="rest-grid"></div>
+      <div id="rest-detail"></div>
     </div>
   </div>
 
@@ -446,8 +457,8 @@ select.fi option{background:var(--bg2);color:var(--text);}
         <div class="sec-title">카페 / 커피</div>
         <button class="sec-btn" onclick="openSheet('sheet-addcafe')">＋ 추가</button>
       </div>
-      <div class="cafe-row" id="cafe-grid"><div class="cafe-card-m"><img class="cafe-img-m" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&amp;q=70" alt="Stopgap Coffee" onerror="this.style.display='none'"><div class="cafe-body-m"><div class="cafe-name-m">Stopgap Coffee</div><div class="cafe-type-m">스페셜티 헤리티지</div><div class="cafe-status-m" style="color:var(--green)">✅ 07:30</div><div class="cafe-status-m" style="margin-top:2px">🅿️ 노상주차</div></div></div><div class="cafe-card-m"><img class="cafe-img-m" src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&amp;q=70" alt="District Café" onerror="this.style.display='none'"><div class="cafe-body-m"><div class="cafe-name-m">District Café</div><div class="cafe-type-m">브런치·카페</div><div class="cafe-status-m" style="color:var(--green)">✅ 08:00</div><div class="cafe-status-m" style="margin-top:2px">🅿️ 노상주차</div></div></div><div class="cafe-card-m"><img class="cafe-img-m" src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&amp;q=70" alt="Credo Coffee" onerror="this.style.display='none'"><div class="cafe-body-m"><div class="cafe-name-m">Credo Coffee</div><div class="cafe-type-m">로컬 로스터</div><div class="cafe-status-m" style="color:var(--green)">✅ 07:00</div><div class="cafe-status-m" style="margin-top:2px">🅿️ 노상주차</div></div></div><div class="cafe-card-m"><img class="cafe-img-m" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&amp;q=70" alt="Transcend Coffee" onerror="this.style.display='none'"><div class="cafe-body-m"><div class="cafe-name-m">Transcend Coffee</div><div class="cafe-type-m">스페셜티 #1</div><div class="cafe-status-m" style="color:var(--green)">✅ 07:00</div><div class="cafe-status-m" style="margin-top:2px">🅿️ 노상주차</div></div></div><div class="cafe-card-m sel"><img class="cafe-img-m" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&amp;q=70" alt="Iconoclast Coffee" onerror="this.style.display='none'"><div class="cafe-body-m"><div class="cafe-name-m">Iconoclast Coffee</div><div class="cafe-type-m">온사이트 로스터</div><div class="cafe-status-m" style="color:var(--green)">✅ 07:30</div><div class="cafe-status-m" style="margin-top:2px">🅿️ 유료주차</div></div></div></div>
-      <div id="cafe-detail"><div class="detail-pane"><img class="detail-img" src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&amp;q=70" alt="Iconoclast Coffee" onerror="this.outerHTML='&lt;div class=detail-img-ph&gt;⚗️&lt;/div&gt;'"><div class="detail-body"><div class="detail-name">Iconoclast Coffee</div><div class="detail-meta">온사이트 로스터 · ⏰ 07:30~17:00</div><div class="detail-meta">📍 10407 Jasper Ave NW, Edmonton</div><div class="detail-desc">다운타운 온사이트 로스팅. 뉴욕 감성.</div><div class="park-pill park-pill-paid"><strong>🅿️ 유료주차</strong> — 전용 없음. 인근 Impark 유료.</div><a class="btn btn-primary btn-sm" href="https://maps.google.com/?q=10407%20Jasper%20Ave%20NW%2C%20Edmonton" target="_blank">📍 Google Maps</a></div></div></div>
+      <div class="cafe-row" id="cafe-grid"></div>
+      <div id="cafe-detail"></div>
     </div>
   </div>
 
@@ -459,23 +470,23 @@ select.fi option{background:var(--bg2);color:var(--text);}
         <button class="map-ctrl-btn" id="mc-sat" onclick="setLayer('sat',this)">위성</button>
         <button class="map-ctrl-btn" id="mc-topo" onclick="setLayer('topo',this)">지형</button>
         <div style="flex:1"></div>
-        <button class="map-ctrl-btn" onclick="leafletMap&amp;&amp;leafletMap.setView([52.2,-113.75],6)">전체</button>
+        <button class="map-ctrl-btn" onclick="leafletMap&&leafletMap.setView([52.2,-113.75],6)">전체</button>
       </div>
       <div class="map-wrap">
-        <div id="mapEl" class="leaflet-container leaflet-touch leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(755px, 388px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 19; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="https://c.tile.openstreetmap.org/6/11/21.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-199px, -21px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/11/20.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-199px, -277px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/10/20.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-455px, -277px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/12/20.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(57px, -277px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/10/21.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-455px, -21px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/12/21.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(57px, -21px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/11/19.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-199px, -533px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/11/22.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-199px, 235px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/10/19.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-455px, -533px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/12/19.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(57px, -533px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/10/22.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-455px, 235px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/12/22.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(57px, 235px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/9/20.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-711px, -277px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/13/20.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(313px, -277px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/9/21.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-711px, -21px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/13/21.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(313px, -21px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/9/19.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-711px, -533px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/13/19.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(313px, -533px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/9/22.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-711px, 235px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/13/22.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(313px, 235px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/8/20.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-967px, -277px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/6/14/20.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(569px, -277px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/8/21.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-967px, -21px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/6/14/21.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(569px, -21px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/8/19.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-967px, -533px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/14/19.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(569px, -533px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/8/22.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-967px, 235px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/6/14/22.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(569px, 235px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"><svg pointer-events="none" class="leaflet-zoom-animated" width="1812" height="930" viewBox="-906 -465 1812 930" style="transform: translate3d(-906px, -465px, 0px);"><g><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.9" fill-rule="evenodd" d="M13,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.9" fill-rule="evenodd" d="M4,-96a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.9" fill-rule="evenodd" d="M4,-98a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.9" fill-rule="evenodd" d="M4,-102a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e74c3c" fill-opacity="0.9" fill-rule="evenodd" d="M4,-97a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f1c40f" fill-opacity="0.9" fill-rule="evenodd" d="M3,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f1c40f" fill-opacity="0.9" fill-rule="evenodd" d="M5,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e87020" fill-opacity="0.9" fill-rule="evenodd" d="M4,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e87020" fill-opacity="0.9" fill-rule="evenodd" d="M4,-98a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#e87020" fill-opacity="0.9" fill-rule="evenodd" d="M4,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f1c40f" fill-opacity="0.9" fill-rule="evenodd" d="M4,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f1c40f" fill-opacity="0.9" fill-rule="evenodd" d="M5,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f1c40f" fill-opacity="0.9" fill-rule="evenodd" d="M4,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f1c40f" fill-opacity="0.9" fill-rule="evenodd" d="M4,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#4a9eff" fill-opacity="0.9" fill-rule="evenodd" d="M3,-80a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#4a9eff" fill-opacity="0.9" fill-rule="evenodd" d="M1,-92a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f39c12" fill-opacity="0.9" fill-rule="evenodd" d="M4,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f39c12" fill-opacity="0.9" fill-rule="evenodd" d="M3,-102a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f39c12" fill-opacity="0.9" fill-rule="evenodd" d="M5,-99a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f39c12" fill-opacity="0.9" fill-rule="evenodd" d="M4,-100a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#f39c12" fill-opacity="0.9" fill-rule="evenodd" d="M5,-101a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#8fa8c8" fill-opacity="0.9" fill-rule="evenodd" d="M-17,108a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#8fa8c8" fill-opacity="0.9" fill-rule="evenodd" d="M-10,-5a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="rgba(255,255,255,.6)" stroke-opacity="1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="#8fa8c8" fill-opacity="0.9" fill-rule="evenodd" d="M2,-80a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 "></path><path class="leaflet-interactive" stroke="#f39c12" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L11 -98"></path><path class="leaflet-interactive" stroke="#f39c12" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M12 -101L11 -98"></path><path class="leaflet-interactive" stroke="#e74c3c" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -100L12 -101"></path><path class="leaflet-interactive" stroke="#2ecc71" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L12 -91L8 -83"></path><path class="leaflet-interactive" stroke="#f39c12" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M8 -83L11 -91L19 -95L20 -101"></path><path class="leaflet-interactive" stroke="#9b59b6" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M20 -101L11 -100"></path><path class="leaflet-interactive" stroke="#4a9eff" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L11 -98"></path><path class="leaflet-interactive" stroke="#e74c3c" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -100L12 -101"></path><path class="leaflet-interactive" stroke="#f39c12" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M12 -101L11 -98"></path><path class="leaflet-interactive" stroke="#f39c12" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M8 -83L11 -91L19 -95L20 -101"></path><path class="leaflet-interactive" stroke="#2ecc71" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L12 -91L8 -83"></path><path class="leaflet-interactive" stroke="#4a9eff" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L11 -98"></path><path class="leaflet-interactive" stroke="#9b59b6" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M20 -101L11 -100"></path><path class="leaflet-interactive" stroke="#f39c12" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L11 -98"></path><path class="leaflet-interactive" stroke="#4a9eff" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L11 -98"></path><path class="leaflet-interactive" stroke="#4a9eff" stroke-opacity="0.9" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M11 -98L11 -98"></path></g></svg></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(11px, -98px, 0px); z-index: -98;"><div style="background:#4a9eff;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">🏢</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(11px, -98px, 0px); z-index: -98;"><div style="background:#4a9eff;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">📍</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(11px, -98px, 0px); z-index: -98;"><div style="background:#4a9eff;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">📍</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(8px, -83px, 0px); z-index: -83;"><div style="background:#4a9eff;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">🛬</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(20px, -101px, 0px); z-index: -101;"><div style="background:#2ecc71;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">🍽️</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(11px, -100px, 0px); z-index: -100;"><div style="background:#9b59b6;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">🏛️</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(12px, -101px, 0px); z-index: -101;"><div style="background:#f39c12;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">☕</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(11px, -98px, 0px); z-index: -98;"><div style="background:#4a9eff;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">📦</div></div><div class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" tabindex="0" role="button" style="margin-left: -11px; margin-top: -11px; width: 22px; height: 22px; transform: translate3d(11px, -98px, 0px); z-index: -98;"><div style="background:#4a9eff;color:white;border:2.5px solid rgba(255,255,255,.8);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 3px 8px rgba(0,0,0,.5)">📦</div></div></div><div class="leaflet-pane leaflet-tooltip-pane"><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-164" style="opacity: 0.9; transform: translate3d(11px, -98px, 0px);">0km·0분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-167" style="opacity: 0.9; transform: translate3d(12px, -100px, 0px);">7km·11분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-170" style="opacity: 0.9; transform: translate3d(12px, -101px, 0px);">3km·7분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-173" style="opacity: 0.9; transform: translate3d(12px, -93px, 0px);">25km·24분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-176" style="opacity: 0.9; transform: translate3d(12px, -93px, 0px);">40km·35분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-179" style="opacity: 0.9; transform: translate3d(13px, -101px, 0px);">14km·19분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-182" style="opacity: 0.9; transform: translate3d(11px, -98px, 0px);">0km·0분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-185" style="opacity: 0.9; transform: translate3d(12px, -101px, 0px);">3km·7분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-188" style="opacity: 0.9; transform: translate3d(12px, -100px, 0px);">7km·11분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-191" style="opacity: 0.9; transform: translate3d(12px, -93px, 0px);">40km·35분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-194" style="opacity: 0.9; transform: translate3d(12px, -93px, 0px);">25km·24분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-197" style="opacity: 0.9; transform: translate3d(11px, -98px, 0px);">0km·0분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-200" style="opacity: 0.9; transform: translate3d(13px, -101px, 0px);">14km·19분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-203" style="opacity: 0.9; transform: translate3d(11px, -98px, 0px);">0km·0분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-206" style="opacity: 0.9; transform: translate3d(11px, -98px, 0px);">0km·0분</div><div class="leaflet-tooltip route-lbl leaflet-zoom-animated leaflet-tooltip-top" role="tooltip" id="leaflet-tooltip-209" style="opacity: 0.9; transform: translate3d(11px, -98px, 0px);">0km·0분</div></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(3015px, 5396.5px, 0px) scale(32);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"></div></div></div>
-        <div class="map-loading-m" id="map-loading" style="display: none;">🛣️ 도로 경로 계산 중...</div>
+        <div id="mapEl"></div>
+        <div class="map-loading-m" id="map-loading">🛣️ 도로 경로 계산 중...</div>
       </div>
     </div>
   </div>
 
   <!-- ⑤ 주소록 PAGE -->
-  <div class="page active" id="page-addr">
+  <div class="page" id="page-addr">
     <div class="page-content">
       <div class="sec-hdr">
         <div class="sec-title">주소록</div>
         <button class="sec-btn" onclick="openSheet('sheet-addr')">＋ 추가</button>
       </div>
-      <div id="addr-list"><div class="addr-card"><div class="addr-icon">🏢</div><div class="addr-info"><div class="addr-name">Western Canadian Place</div><div class="addr-street">707 8th Ave SW, Calgary, AB</div><div class="addr-note">사무실</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('wcp')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=707%208th%20Ave%20SW%2C%20Calgary%2C%20AB" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=707%208th%20Ave%20SW%2C%20Calgary%2C%20AB" target="_blank">🍎</a><a class="addr-btn" href="tel:+14032027577">📞</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('wcp')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">📦</div><div class="addr-info"><div class="addr-name">픽업① Spruce Place</div><div class="addr-street">1104-99 Spruce Pl SW, Calgary</div><div class="addr-note">08:20</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('pk1')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=1104-99%20Spruce%20Pl%20SW%2C%20Calgary" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=1104-99%20Spruce%20Pl%20SW%2C%20Calgary" target="_blank">🍎</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('pk1')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">📦</div><div class="addr-info"><div class="addr-name">픽업② Riverfront Ave</div><div class="addr-street">222 Riverfront Ave SW, Calgary</div><div class="addr-note">08:40</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('pk2')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=222%20Riverfront%20Ave%20SW%2C%20Calgary" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=222%20Riverfront%20Ave%20SW%2C%20Calgary" target="_blank">🍎</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('pk2')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">🏛️</div><div class="addr-info"><div class="addr-name">앨버타 주청사</div><div class="addr-street">10800 97 Ave NW, Edmonton, AB</div><div class="addr-note">West Entrance만</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('legis')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=10800%2097%20Ave%20NW%2C%20Edmonton%2C%20AB" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=10800%2097%20Ave%20NW%2C%20Edmonton%2C%20AB" target="_blank">🍎</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('legis')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">🏛️</div><div class="addr-info"><div class="addr-name">QEII 빌딩(에너지부)</div><div class="addr-street">9820 107 St NW, Edmonton, AB</div><div class="addr-note">West Entrance</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('qeii')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=9820%20107%20St%20NW%2C%20Edmonton%2C%20AB" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=9820%20107%20St%20NW%2C%20Edmonton%2C%20AB" target="_blank">🍎</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('qeii')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">✈️</div><div class="addr-info"><div class="addr-name">YEG 에드먼턴 공항</div><div class="addr-street">1000 Airport Rd, Leduc, AB</div><div class="addr-note">Door 7·8 픽업</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('yeg')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=1000%20Airport%20Rd%2C%20Leduc%2C%20AB" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=1000%20Airport%20Rd%2C%20Leduc%2C%20AB" target="_blank">🍎</a><a class="addr-btn" href="tel:+17808908900">📞</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('yeg')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">📍</div><div class="addr-info"><div class="addr-name">정진환 차장</div><div class="addr-street">99 Spruce Place sw, calgary t3c 3x7</div><div class="addr-note">자택</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('a1784778989445')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=99%20Spruce%20Place%20sw%2C%20calgary%20t3c%203x7" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=99%20Spruce%20Place%20sw%2C%20calgary%20t3c%203x7" target="_blank">🍎</a><a class="addr-btn" href="tel:+14038804797">📞</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('a1784778989445')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">📍</div><div class="addr-info"><div class="addr-name">서정우 법인장님</div><div class="addr-street">222  Riverfront Ave. SW, Calgary T2P 0W3</div><div class="addr-note">자택</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('a1784779076099')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=222%20%20Riverfront%20Ave.%20SW%2C%20Calgary%20T2P%200W3" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=222%20%20Riverfront%20Ave.%20SW%2C%20Calgary%20T2P%200W3" target="_blank">🍎</a><a class="addr-btn" href="tel:+14038753296">📞</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('a1784779076099')">삭제</button></div></div></div><div class="addr-card"><div class="addr-icon">📍</div><div class="addr-info"><div class="addr-name">High Level Bridge Streetcar</div><div class="addr-street">Edmonton</div><div class="addr-btns"><button class="addr-btn" onclick="addrToStop('a1784781161544')">+경로</button><a class="addr-btn" href="https://maps.google.com/?q=Edmonton" target="_blank">🗺️</a><a class="addr-btn" href="https://maps.apple.com/?q=Edmonton" target="_blank">🍎</a><button class="addr-btn" style="color:var(--red)" onclick="delAddr('a1784781161544')">삭제</button></div></div></div></div>
+      <div id="addr-list"></div>
 
       <!-- 저장/내보내기 섹션 -->
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
@@ -503,32 +514,32 @@ select.fi option{background:var(--bg2);color:var(--text);}
 </div>
 
 <!-- TAB BAR -->
-<div class="tabs">
-  <div class="tab-item" id="tab-schedule" onclick="showPage('schedule')">
+<div class="tabs" id="tab-bar-wrap">
+  <button class="tab-item active" id="tab-schedule" data-page="schedule">
     <div class="tab-icon">📋</div>
     <div class="tab-label">일정</div>
     <div class="tab-dot"></div>
-  </div>
-  <div class="tab-item" id="tab-rest" onclick="showPage('rest')">
+  </button>
+  <button class="tab-item" id="tab-rest" data-page="rest">
     <div class="tab-icon">🍽️</div>
     <div class="tab-label">식당</div>
     <div class="tab-dot"></div>
-  </div>
-  <div class="tab-item" id="tab-cafe" onclick="showPage('cafe')">
+  </button>
+  <button class="tab-item" id="tab-cafe" data-page="cafe">
     <div class="tab-icon">☕</div>
     <div class="tab-label">카페</div>
     <div class="tab-dot"></div>
-  </div>
-  <div class="tab-item" id="tab-map" onclick="showPage('map')">
+  </button>
+  <button class="tab-item" id="tab-map" data-page="map">
     <div class="tab-icon">🗺️</div>
     <div class="tab-label">지도</div>
     <div class="tab-dot"></div>
-  </div>
-  <div class="tab-item active" id="tab-addr" onclick="showPage('addr')">
+  </button>
+  <button class="tab-item" id="tab-addr" data-page="addr">
     <div class="tab-icon">📌</div>
     <div class="tab-label">주소록</div>
     <div class="tab-dot"></div>
-  </div>
+  </button>
 </div>
 
 </div><!-- .app -->
@@ -659,28 +670,28 @@ select.fi option{background:var(--bg2);color:var(--text);}
 <script>
 // ═══════════════ DATA ═══════════════
 var IMGS={
-  zigle:'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400&q=70',
-  baekjeong:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70',
-  hanjan:'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&q=70',
-  sang:'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&q=70',
-  dookbaeki:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=70',
-  japonais:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&q=70',
-  dorinku:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70',
-  mikado:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70',
-  izakaya:'https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=70',
-  jinya:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70',
-  lingnan:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70',
-  ruths:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=70',
-  sorrento:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70',
-  butternut:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=70',
-  sawmill:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=70',
-  keg:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70',
-  stopgap:'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&q=70',
-  district:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&q=70',
-  credo:'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70',
-  transcend:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=70',
-  iconoclast:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=70'
-};
+  zigle:'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400',
+  baekjeong:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400',
+  hanjan:'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400',
+  sang:'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400',
+  dookbaeki:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400',
+  japonais:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=400',
+  dorinku:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400',
+  mikado:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400',
+  izakaya:'https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400',
+  jinya:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400',
+  lingnan:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400',
+  ruths:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
+  sorrento:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400',
+  butternut:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400',
+  sawmill:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400',
+  keg:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400',
+  stopgap:'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400',
+  district:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400',
+  credo:'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400',
+  transcend:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
+  iconoclast:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400'
+}
 
 var restaurants=[
   {id:'zigle',name:'ZIGLE Korean Bulgogi',icon:'🍖',cat:'korean',cuisine:'한식 불고기',addr:'800 Broadmoor Blvd #900, Sherwood Park',phone:'825-967-1140',open:'11:30',close:'21:00',lat:53.5381,lng:-113.3212,rating:4.9,note:'공항 15분',price:'$$',lunchOk:true,hasPrivate:false,vip:false,parking:{type:'free',detail:'쇼핑몰 단지 내 대형 무료 주차장. 매우 편리.'},desc:'찌글이 원조. 에드먼턴 최고 평점(★4.9). iPad 주문. 불고기·짜글이·솥밥.',img:IMGS.zigle},
@@ -699,7 +710,7 @@ var restaurants=[
   {id:'butternut',name:'The Butternut Tree',icon:'🌰',cat:'western',cuisine:'캐나다 파인다이닝',addr:'9707 110 St NW #101, Edmonton',phone:'780-760-2271',open:'17:00',close:'22:00',lat:53.5360,lng:-113.5125,rating:4.5,note:'주청사 2분',price:'$$$$$',lunchOk:false,hasPrivate:true,vip:true,parking:{type:'paid',detail:'지하 Impark Lot#477 유료(높이 6\'1" 제한). 뒤편 Lot#371도 가능.'},desc:'주청사 2분. 리버밸리 파노라마뷰. Top 셰프 Scott Downey. 저녁 전용.',img:IMGS.butternut},
   {id:'sawmill',name:'Sawmill Leduc',icon:'🥩',cat:'western',cuisine:'스테이크',addr:'5221 Discovery Way, Leduc, AB',phone:'780-612-4001',open:'11:00',close:'22:00',lat:53.2686,lng:-113.5437,rating:4.3,note:'공항 10분',price:'$$$',lunchOk:true,hasPrivate:false,vip:false,parking:{type:'free',detail:'전용 대형 무료 주차장. 공항 픽업 직후 최적.'},desc:'공항 가장 근접. Alberta beef 스테이크.',img:IMGS.sawmill},
   {id:'keg',name:'The Keg Windermere',icon:'🥩',cat:'western',cuisine:'스테이크·해산물',addr:'6104 Andrews Gate SW, Edmonton',phone:'780-989-6160',open:'11:30',close:'22:00',lat:53.4232,lng:-113.5851,rating:4.3,note:'공항 15분',price:'$$$',lunchOk:true,hasPrivate:false,vip:false,parking:{type:'free',detail:'Windermere 쇼핑몰 전용 대형 무료 주차.'},desc:'캐나다 프리미엄 스테이크. 공항→시내 경로 상.',img:IMGS.keg}
-];
+]
 
 var cafes=[
   {id:'stopgap',name:'Stopgap Coffee',icon:'☕',type:'스페셜티 헤리티지',addr:'9749 111 St NW, Edmonton',open:'07:30',close:'15:00',closedDays:[0,1],lat:53.5355,lng:-113.5118,note:'주청사 도보 10분',parking:{type:'street',detail:'111 St 노상무료(2시간). 건물 앞 소수 공간.'},desc:'헤리티지 벽돌 건물. 리버밸리뷰 도보 5분. 비즈니스 미팅 최적.',img:IMGS.stopgap},
@@ -707,7 +718,7 @@ var cafes=[
   {id:'credo',name:'Credo Coffee',icon:'☕',type:'로컬 로스터',addr:'10359 82 Ave NW, Edmonton',open:'07:00',close:'18:00',closedDays:[],lat:53.5203,lng:-113.4959,note:'Whyte Ave',parking:{type:'street',detail:'82 Ave 노상주차. 평일 낮 여유.'},desc:'에드먼턴 로컬 로스터. 자연광 미니멀 인테리어.',img:IMGS.credo},
   {id:'transcend',name:'Transcend Coffee',icon:'✨',type:'스페셜티 #1',addr:'8708 109 St NW, Edmonton',open:'07:00',close:'19:00',closedDays:[],lat:53.5247,lng:-113.5056,note:'Garneau',parking:{type:'street',detail:'Garneau 주거지역 노상무료.'},desc:'에드먼턴 #1 스페셜티 로스터. 싱글오리진 pour-over.',img:IMGS.transcend},
   {id:'iconoclast',name:'Iconoclast Coffee',icon:'⚗️',type:'온사이트 로스터',addr:'10407 Jasper Ave NW, Edmonton',open:'07:30',close:'17:00',closedDays:[],lat:53.5458,lng:-113.4913,note:'다운타운',parking:{type:'paid',detail:'전용 없음. 인근 Impark 유료.'},desc:'다운타운 온사이트 로스팅. 뉴욕 감성.',img:IMGS.iconoclast}
-];
+]
 
 var addrBook=[
   {id:'wcp',icon:'🏢',name:'Western Canadian Place',addr:'707 8th Ave SW, Calgary, AB',phone:'403-202-7577',note:'사무실'},
@@ -716,13 +727,13 @@ var addrBook=[
   {id:'legis',icon:'🏛️',name:'앨버타 주청사',addr:'10800 97 Ave NW, Edmonton, AB',phone:'',note:'West Entrance만'},
   {id:'qeii',icon:'🏛️',name:'QEII 빌딩(에너지부)',addr:'9820 107 St NW, Edmonton, AB',phone:'',note:'West Entrance'},
   {id:'yeg',icon:'✈️',name:'YEG 에드먼턴 공항',addr:'1000 Airport Rd, Leduc, AB',phone:'780-890-8900',note:'Door 7·8 픽업'}
-];
+]
 
 var HWY2=[
   {name:'Okotoks Tim Hortons',icon:'☕',lat:50.7264,lng:-113.9733,km:'~40km'},
   {name:'Red Deer Gas Alley',icon:'⛽',lat:52.2690,lng:-113.8158,km:'~150km'},
   {name:'Leduc Costco',icon:'🛒',lat:53.2601,lng:-113.5499,km:'~280km'}
-];
+]
 
 // ═══════════════════════ STATE ═══════════════════════
 var S={
@@ -739,7 +750,7 @@ var stops=[
   {id:'cafe',name:'카페',icon:'☕',type:'cafe',dur:20,lat:53.535,lng:-113.512,color:'#f39c12',addr:'미선택'},
   {id:'legis',name:'앨버타 주청사',icon:'🏛️',type:'legis',dur:90,lat:53.5334,lng:-113.5066,color:'#9b59b6',addr:'10800 97 Ave NW, Edmonton, AB'},
   {id:'ret',name:'YEG 귀환',icon:'✈️',type:'return',dur:0,lat:53.3027,lng:-113.5769,color:'#e74c3c',addr:'1000 Airport Rd, Leduc, AB'}
-];
+]
 
 // ═══════════════════════ UTILS ═══════════════════════
 function fmt(h,m){return String(Math.floor(h)%24).padStart(2,'0')+':'+String(Math.round(m)%60).padStart(2,'0');}
@@ -1215,10 +1226,26 @@ var curPage='schedule';
 function showPage(p){
   document.querySelectorAll('.page').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.tab-item').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('page-'+p).classList.add('active');
-  document.getElementById('tab-'+p).classList.add('active');
+  var pg=document.getElementById('page-'+p);
+  var tb=document.getElementById('tab-'+p);
+  if(pg)pg.classList.add('active');
+  if(tb)tb.classList.add('active');
   curPage=p;
-  if(p==='map'&&leafletMap){setTimeout(function(){leafletMap.invalidateSize();},150);}
+  if(p==='map'&&leafletMap){setTimeout(function(){leafletMap.invalidateSize();},200);}
+}
+
+function bindTabs(){
+  var tabWrap=document.getElementById('tab-bar-wrap');
+  if(!tabWrap)return;
+  tabWrap.addEventListener('click',function(e){
+    var btn=e.target.closest('[data-page]');
+    if(btn)showPage(btn.dataset.page);
+  });
+  // iOS Safari touchend fallback
+  tabWrap.addEventListener('touchend',function(e){
+    var btn=e.target.closest('[data-page]');
+    if(btn){e.preventDefault();showPage(btn.dataset.page);}
+  },{passive:false});
 }
 
 // ═══════════════════════ SHEETS ═══════════════════════
@@ -1450,6 +1477,26 @@ function saveAll(){
 }
 
 function loadAll(){
+  // If this is an exported file with embedded data, load it first
+  if(window.__EXPORTED__){
+    try{
+      var ed=window.__EXPORTED__;
+      if(ed.S)Object.assign(S,ed.S);
+      if(ed.stops)stops=ed.stops;
+      if(ed.restaurants)restaurants=ed.restaurants;
+      if(ed.cafes)cafes=ed.cafes;
+      if(ed.addrBook)addrBook=ed.addrBook;
+      // Restore lock data if present
+      if(ed.lockData)localStorage.setItem(LOCK_KEY,ed.lockData);
+      // Save to local localStorage for future use
+      localStorage.setItem(SAVE_KEY,JSON.stringify({
+        S:ed.S,stops:ed.stops,restaurants:ed.restaurants,
+        cafes:ed.cafes,addrBook:ed.addrBook,savedAt:ed.savedAt
+      }));
+      window.__EXPORTED__=null; // consume once
+      return ed.savedAt||true;
+    }catch(e){console.warn('Exported data restore failed:',e);}
+  }
   try{
     var raw=localStorage.getItem(SAVE_KEY);
     if(!raw)return false;
@@ -1471,26 +1518,44 @@ function clearSave(){
 
 // HTML 파일로 내보내기 (현재 상태가 기본값으로 박힌 파일 다운로드)
 function exportHTML(){
-  var data={S:S,stops:stops,restaurants:restaurants,cafes:cafes,addrBook:addrBook,savedAt:new Date().toISOString()};
-  var html=document.documentElement.outerHTML;
-  // inject saved data before the INIT section
-  var inject='/* INJECTED SAVE */
-try{localStorage.setItem("boss_guide_v1",'{"S":{"transport":"car","date":"2026-07-23","flight":"09:00|09:53","returnFlight":"18:40","carH":8,"carM":10,"carFrom":"Calgary, AB","restId":"zigle","cafeId":"iconoclast","restFilter":"korean","arriveYEG":{"h":10,"m":30},"sched":{"depart":"08:10","yeg":"10:30","wcp":"10:45","a1784778989445":"11:15","a1784779076099":"11:45","rest":"12:15","legis":"14:00","cafe":"15:45","pk2":"16:20","pk1":"16:50"},"_saveTimer":3},"stops":[{"id":"wcp","name":"Western Canadian Place","icon":"🏢","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"707 8th Ave SW, Calgary, AB"},{"id":"a1784778989445","name":"정진환 차장","icon":"📍","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"99 Spruce Place sw, calgary t3c 3x7"},{"id":"a1784779076099","name":"서정우 법인장님","icon":"📍","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"222  Riverfront Ave. SW, Calgary T2P 0W3"},{"id":"yeg","name":"YEG 공항 도착","icon":"🛬","type":"arrive","dur":15,"lat":53.3027,"lng":-113.5769,"color":"#4a9eff","addr":"1000 Airport Rd, Leduc, AB"},{"id":"rest","name":"ZIGLE Korean Bulgogi","icon":"🍽️","type":"restaurant","dur":90,"lat":53.5381,"lng":-113.3212,"color":"#2ecc71","addr":"800 Broadmoor Blvd #900, Sherwood Park"},{"id":"legis","name":"앨버타 주청사","icon":"🏛️","type":"legis","dur":90,"lat":53.5334,"lng":-113.5066,"color":"#9b59b6","addr":"10800 97 Ave NW, Edmonton, AB"},{"id":"cafe","name":"Iconoclast Coffee","icon":"☕","type":"cafe","dur":20,"lat":53.5458,"lng":-113.4913,"color":"#f39c12","addr":"10407 Jasper Ave NW, Edmonton"},{"id":"pk2","name":"픽업② Riverfront Ave","icon":"📦","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"222 Riverfront Ave SW, Calgary"},{"id":"pk1","name":"픽업① Spruce Place","icon":"📦","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"1104-99 Spruce Pl SW, Calgary"}],"restaurants":[{"id":"zigle","name":"ZIGLE Korean Bulgogi","icon":"🍖","cat":"korean","cuisine":"한식 불고기","addr":"800 Broadmoor Blvd #900, Sherwood Park","phone":"825-967-1140","open":"11:30","close":"21:00","lat":53.5381,"lng":-113.3212,"rating":4.9,"note":"공항 15분","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"쇼핑몰 단지 내 대형 무료 주차장. 매우 편리."},"desc":"찌글이 원조. 에드먼턴 최고 평점(★4.9). iPad 주문. 불고기·짜글이·솥밥.","img":"https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400&q=70"},{"id":"baekjeong","name":"Baekjeong Korean BBQ","icon":"🥓","cat":"korean","cuisine":"한식 KBBQ","addr":"2874 Calgary Trail NW, Edmonton","phone":"587-524-4335","open":"16:30","close":"22:00","lat":53.4713,"lng":-113.5102,"rating":4.4,"note":"공항 20분","price":"$$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"스트립몰 전용 무료 주차장. 넉넉한 공간."},"desc":"Sterling Silver Alberta 쇠고기. 테이블 가스 그릴 KBBQ. 저녁 전용.","img":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70"},{"id":"hanjan","name":"Hanjan Korean","icon":"🥘","cat":"korean","cuisine":"한식 바","addr":"3735 99 St NW, Edmonton","phone":"587-454-3333","open":"11:00","close":"24:00","lat":53.503,"lng":-113.5017,"rating":4.3,"note":"Whyte Ave","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"street","detail":"건물 옆 소규모 주차 + 99 St 노상주차."},"desc":"에드먼턴 #1 한식당. 점심~심야. 삼겹살·양념치킨·솥밥.","img":"https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&q=70"},{"id":"sang","name":"SANG Seoul Table","icon":"🍱","cat":"korean","cuisine":"한식 AYCE","addr":"9929 109 St NW, Edmonton","phone":"780-244-1976","open":"17:00","close":"22:00","lat":53.5478,"lng":-113.5078,"rating":4.3,"note":"주청사 5분","price":"$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 주차 없음. 109 St 노상유료 또는 Impark."},"desc":"한식 무한리필 AYCE. 저녁 전용. 주청사 도보 5분.","img":"https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&q=70"},{"id":"dookbaeki","name":"Dookbaeki Hot Stone","icon":"🍲","cat":"korean","cuisine":"돌솥 한식","addr":"8130 Gateway Blvd NW, Edmonton","phone":"780-416-0585","open":"11:30","close":"21:00","lat":53.4891,"lng":-113.5069,"rating":4.3,"note":"공항 방향","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"쇼핑센터 스트립몰 무료 주차장."},"desc":"돌솥 한식 전문. 뚝배기 국밥·감자탕. 48시간 육수.","img":"https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=70"},{"id":"japonais","name":"Japonais Bistro","icon":"🍣","cat":"japanese","cuisine":"현대 일식·스시","addr":"11806 Jasper Ave NW, Edmonton","phone":"780-760-1616","open":"11:30","close":"21:30","lat":53.5384,"lng":-113.5284,"rating":4.5,"note":"주청사 12분","price":"$$","lunchOk":true,"hasPrivate":false,"vip":true,"parking":{"type":"none","detail":"전용 주차 없음. Jasper Ave 노상유료 또는 Impark."},"desc":"에드먼턴 최고 일식 비스트로. 랍스터 우동·창작 스시. 점심 벤토 $20~.","img":"https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&q=70"},{"id":"dorinku","name":"Dorinku Osaka","icon":"🍱","cat":"japanese","cuisine":"이자카야·스시","addr":"10328 Jasper Ave NW, Edmonton","phone":"780-244-6588","open":"11:30","close":"21:30","lat":53.5445,"lng":-113.4944,"rating":4.5,"note":"주청사 10분","price":"$$","lunchOk":true,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"전용 없음. 인근 Impark·EasyPark 유료(도보 3~5분)."},"desc":"오사카 테마 이자카야. 시크릿 프라이빗룸. 오코노미야키·카츠산도·스시.","img":"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70"},{"id":"mikado","name":"Mikado Downtown","icon":"🍣","cat":"japanese","cuisine":"스시·일식","addr":"10350 109 St NW, Edmonton","phone":"780-425-8490","open":"11:30","close":"21:00","lat":53.546,"lng":-113.5075,"rating":4.6,"note":"주청사 5분","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 없음. 109 St 노상유료 또는 Impark."},"desc":"★4.6 에드먼턴 스시 1위. 점심 특선 세트. 주청사 5분.","img":"https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70"},{"id":"izakaya","name":"Izakaya Tomo","icon":"🍶","cat":"japanese","cuisine":"이자카야","addr":"3739 99 St NW, Edmonton","phone":"780-440-9152","open":"17:00","close":"22:00","lat":53.503,"lng":-113.5017,"rating":4.4,"note":"Whyte Ave","price":"$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"street","detail":"건물 앞 소규모 무료 주차 + 99 St 노상."},"desc":"에드먼턴 최초 이자카야. 타코야키·사시미·타타키. 저녁 전용.","img":"https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=70"},{"id":"jinya","name":"JINYA Ramen Bar","icon":"🍜","cat":"japanese","cuisine":"일본 라멘","addr":"10037 109 St NW, Edmonton","phone":"780-249-6658","open":"11:30","close":"22:00","lat":53.5461,"lng":-113.5073,"rating":4.3,"note":"주청사 5분","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 없음. 인근 유료 노상 또는 Impark."},"desc":"20시간 돼지뼈 육수. 다운타운 도보권. 라멘+사이드 $20~.","img":"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70"},{"id":"lingnan","name":"The Lingnan (1947)","icon":"🥢","cat":"chinese","cuisine":"중식 파인다이닝","addr":"10582 104 St NW, Edmonton","phone":"780-426-3975","open":"16:30","close":"21:00","lat":53.5442,"lng":-113.5007,"rating":4.3,"note":"주청사 5분","price":"$$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 없음. 104 St 노상유료(시간제). Impark 이용 권장."},"desc":"1947년 창업 최장수 중식당. 격식 있는 중식 코스. 저녁 전용.","img":"https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70"},{"id":"ruths","name":"Ruth\'s Chris Steak","icon":"🥩","cat":"western","cuisine":"아메리칸 스테이크","addr":"9990 Jasper Ave NW, Edmonton","phone":"780-420-0091","open":"11:30","close":"22:00","lat":53.5441,"lng":-113.4896,"rating":4.4,"note":"주청사 8분","price":"$$","lunchOk":true,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"건물 Impark 지하 유료. Jasper Ave 노상유료. 발렛 없음."},"desc":"프라이빗룸 5개(최대 60명). Premium Vault·Boardroom. USDA Prime 시즐링.","img":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=70"},{"id":"sorrento","name":"Sorrentino\'s","icon":"🇮🇹","cat":"western","cuisine":"이탈리안","addr":"10162 100 St NW, Edmonton","phone":"780-424-7500","open":"11:30","close":"22:00","lat":53.5424,"lng":-113.5001,"rating":4.3,"note":"주청사 10분","price":"$$","lunchOk":true,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"전용 없음. 100 St 인근 Impark 유료."},"desc":"Telus Room·Maurizio Room 프라이빗룸. 코퍼릿 런치. 랍스터 스파게티.","img":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70"},{"id":"butternut","name":"The Butternut Tree","icon":"🌰","cat":"western","cuisine":"캐나다 파인다이닝","addr":"9707 110 St NW #101, Edmonton","phone":"780-760-2271","open":"17:00","close":"22:00","lat":53.536,"lng":-113.5125,"rating":4.5,"note":"주청사 2분","price":"$$$","lunchOk":false,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"지하 Impark Lot#477 유료(높이 6\'1\\" 제한). 뒤편 Lot#371도 가능."},"desc":"주청사 2분. 리버밸리 파노라마뷰. Top 셰프 Scott Downey. 저녁 전용.","img":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=70"},{"id":"sawmill","name":"Sawmill Leduc","icon":"🥩","cat":"western","cuisine":"스테이크","addr":"5221 Discovery Way, Leduc, AB","phone":"780-612-4001","open":"11:00","close":"22:00","lat":53.2686,"lng":-113.5437,"rating":4.3,"note":"공항 10분","price":"$$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"전용 대형 무료 주차장. 공항 픽업 직후 최적."},"desc":"공항 가장 근접. Alberta beef 스테이크.","img":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=70"},{"id":"keg","name":"The Keg Windermere","icon":"🥩","cat":"western","cuisine":"스테이크·해산물","addr":"6104 Andrews Gate SW, Edmonton","phone":"780-989-6160","open":"11:30","close":"22:00","lat":53.4232,"lng":-113.5851,"rating":4.3,"note":"공항 15분","price":"$$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"Windermere 쇼핑몰 전용 대형 무료 주차."},"desc":"캐나다 프리미엄 스테이크. 공항→시내 경로 상.","img":"https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70"}],"cafes":[{"id":"stopgap","name":"Stopgap Coffee","icon":"☕","type":"스페셜티 헤리티지","addr":"9749 111 St NW, Edmonton","open":"07:30","close":"15:00","closedDays":[0,1],"lat":53.5355,"lng":-113.5118,"note":"주청사 도보 10분","parking":{"type":"street","detail":"111 St 노상무료(2시간). 건물 앞 소수 공간."},"desc":"헤리티지 벽돌 건물. 리버밸리뷰 도보 5분. 비즈니스 미팅 최적.","img":"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&q=70"},{"id":"district","name":"District Café","icon":"🥐","type":"브런치·카페","addr":"10160 116 St NW, Edmonton","open":"08:00","close":"16:00","closedDays":[],"lat":53.5497,"lng":-113.5232,"note":"주청사 5분","parking":{"type":"street","detail":"116 St 노상주차 가능. 주거지역 비교적 여유."},"desc":"주청사 인근 비즈니스 카페. 시나몬번·샌드위치.","img":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&q=70"},{"id":"credo","name":"Credo Coffee","icon":"☕","type":"로컬 로스터","addr":"10359 82 Ave NW, Edmonton","open":"07:00","close":"18:00","closedDays":[],"lat":53.5203,"lng":-113.4959,"note":"Whyte Ave","parking":{"type":"street","detail":"82 Ave 노상주차. 평일 낮 여유."},"desc":"에드먼턴 로컬 로스터. 자연광 미니멀 인테리어.","img":"https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70"},{"id":"transcend","name":"Transcend Coffee","icon":"✨","type":"스페셜티 #1","addr":"8708 109 St NW, Edmonton","open":"07:00","close":"19:00","closedDays":[],"lat":53.5247,"lng":-113.5056,"note":"Garneau","parking":{"type":"street","detail":"Garneau 주거지역 노상무료."},"desc":"에드먼턴 #1 스페셜티 로스터. 싱글오리진 pour-over.","img":"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=70"},{"id":"iconoclast","name":"Iconoclast Coffee","icon":"⚗️","type":"온사이트 로스터","addr":"10407 Jasper Ave NW, Edmonton","open":"07:30","close":"17:00","closedDays":[],"lat":53.5458,"lng":-113.4913,"note":"다운타운","parking":{"type":"paid","detail":"전용 없음. 인근 Impark 유료."},"desc":"다운타운 온사이트 로스팅. 뉴욕 감성.","img":"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=70"}],"addrBook":[{"id":"wcp","icon":"🏢","name":"Western Canadian Place","addr":"707 8th Ave SW, Calgary, AB","phone":"403-202-7577","note":"사무실"},{"id":"pk1","icon":"📦","name":"픽업① Spruce Place","addr":"1104-99 Spruce Pl SW, Calgary","phone":"","note":"08:20"},{"id":"pk2","icon":"📦","name":"픽업② Riverfront Ave","addr":"222 Riverfront Ave SW, Calgary","phone":"","note":"08:40"},{"id":"legis","icon":"🏛️","name":"앨버타 주청사","addr":"10800 97 Ave NW, Edmonton, AB","phone":"","note":"West Entrance만"},{"id":"qeii","icon":"🏛️","name":"QEII 빌딩(에너지부)","addr":"9820 107 St NW, Edmonton, AB","phone":"","note":"West Entrance"},{"id":"yeg","icon":"✈️","name":"YEG 에드먼턴 공항","addr":"1000 Airport Rd, Leduc, AB","phone":"780-890-8900","note":"Door 7·8 픽업"},{"id":"a1784778989445","icon":"📍","name":"정진환 차장","addr":"99 Spruce Place sw, calgary t3c 3x7","phone":"4038804797","note":"자택"},{"id":"a1784779076099","icon":"📍","name":"서정우 법인장님","addr":"222  Riverfront Ave. SW, Calgary T2P 0W3","phone":"4038753296","note":"자택"},{"id":"a1784781161544","icon":"📍","name":"High Level Bridge Streetcar","addr":"Edmonton","phone":"","note":""}],"savedAt":"2026-07-23T04:35:50.212Z"}');}catch(e){}\ntry{localStorage.setItem("'+SAVE_KEY+'",\''+JSON.stringify(data).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\');}catch(e){}';
-  html=html.replace('/* INJECTED SAVE */',inject);
-  // if no placeholder yet, inject before INIT
-  if(html.indexOf('/* INJECTED SAVE */')>=0){
-    html=html.replace('/* INJECTED SAVE */
-try{localStorage.setItem("boss_guide_v1",'{"S":{"transport":"car","date":"2026-07-23","flight":"09:00|09:53","returnFlight":"18:40","carH":8,"carM":10,"carFrom":"Calgary, AB","restId":"zigle","cafeId":"iconoclast","restFilter":"korean","arriveYEG":{"h":10,"m":30},"sched":{"depart":"08:10","yeg":"10:30","wcp":"10:45","a1784778989445":"11:15","a1784779076099":"11:45","rest":"12:15","legis":"14:00","cafe":"15:45","pk2":"16:20","pk1":"16:50"},"_saveTimer":3},"stops":[{"id":"wcp","name":"Western Canadian Place","icon":"🏢","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"707 8th Ave SW, Calgary, AB"},{"id":"a1784778989445","name":"정진환 차장","icon":"📍","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"99 Spruce Place sw, calgary t3c 3x7"},{"id":"a1784779076099","name":"서정우 법인장님","icon":"📍","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"222  Riverfront Ave. SW, Calgary T2P 0W3"},{"id":"yeg","name":"YEG 공항 도착","icon":"🛬","type":"arrive","dur":15,"lat":53.3027,"lng":-113.5769,"color":"#4a9eff","addr":"1000 Airport Rd, Leduc, AB"},{"id":"rest","name":"ZIGLE Korean Bulgogi","icon":"🍽️","type":"restaurant","dur":90,"lat":53.5381,"lng":-113.3212,"color":"#2ecc71","addr":"800 Broadmoor Blvd #900, Sherwood Park"},{"id":"legis","name":"앨버타 주청사","icon":"🏛️","type":"legis","dur":90,"lat":53.5334,"lng":-113.5066,"color":"#9b59b6","addr":"10800 97 Ave NW, Edmonton, AB"},{"id":"cafe","name":"Iconoclast Coffee","icon":"☕","type":"cafe","dur":20,"lat":53.5458,"lng":-113.4913,"color":"#f39c12","addr":"10407 Jasper Ave NW, Edmonton"},{"id":"pk2","name":"픽업② Riverfront Ave","icon":"📦","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"222 Riverfront Ave SW, Calgary"},{"id":"pk1","name":"픽업① Spruce Place","icon":"📦","type":"custom","dur":15,"lat":53.5,"lng":-113.5,"color":"#4a9eff","addr":"1104-99 Spruce Pl SW, Calgary"}],"restaurants":[{"id":"zigle","name":"ZIGLE Korean Bulgogi","icon":"🍖","cat":"korean","cuisine":"한식 불고기","addr":"800 Broadmoor Blvd #900, Sherwood Park","phone":"825-967-1140","open":"11:30","close":"21:00","lat":53.5381,"lng":-113.3212,"rating":4.9,"note":"공항 15분","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"쇼핑몰 단지 내 대형 무료 주차장. 매우 편리."},"desc":"찌글이 원조. 에드먼턴 최고 평점(★4.9). iPad 주문. 불고기·짜글이·솥밥.","img":"https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400&q=70"},{"id":"baekjeong","name":"Baekjeong Korean BBQ","icon":"🥓","cat":"korean","cuisine":"한식 KBBQ","addr":"2874 Calgary Trail NW, Edmonton","phone":"587-524-4335","open":"16:30","close":"22:00","lat":53.4713,"lng":-113.5102,"rating":4.4,"note":"공항 20분","price":"$$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"스트립몰 전용 무료 주차장. 넉넉한 공간."},"desc":"Sterling Silver Alberta 쇠고기. 테이블 가스 그릴 KBBQ. 저녁 전용.","img":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70"},{"id":"hanjan","name":"Hanjan Korean","icon":"🥘","cat":"korean","cuisine":"한식 바","addr":"3735 99 St NW, Edmonton","phone":"587-454-3333","open":"11:00","close":"24:00","lat":53.503,"lng":-113.5017,"rating":4.3,"note":"Whyte Ave","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"street","detail":"건물 옆 소규모 주차 + 99 St 노상주차."},"desc":"에드먼턴 #1 한식당. 점심~심야. 삼겹살·양념치킨·솥밥.","img":"https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&q=70"},{"id":"sang","name":"SANG Seoul Table","icon":"🍱","cat":"korean","cuisine":"한식 AYCE","addr":"9929 109 St NW, Edmonton","phone":"780-244-1976","open":"17:00","close":"22:00","lat":53.5478,"lng":-113.5078,"rating":4.3,"note":"주청사 5분","price":"$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 주차 없음. 109 St 노상유료 또는 Impark."},"desc":"한식 무한리필 AYCE. 저녁 전용. 주청사 도보 5분.","img":"https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&q=70"},{"id":"dookbaeki","name":"Dookbaeki Hot Stone","icon":"🍲","cat":"korean","cuisine":"돌솥 한식","addr":"8130 Gateway Blvd NW, Edmonton","phone":"780-416-0585","open":"11:30","close":"21:00","lat":53.4891,"lng":-113.5069,"rating":4.3,"note":"공항 방향","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"쇼핑센터 스트립몰 무료 주차장."},"desc":"돌솥 한식 전문. 뚝배기 국밥·감자탕. 48시간 육수.","img":"https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=70"},{"id":"japonais","name":"Japonais Bistro","icon":"🍣","cat":"japanese","cuisine":"현대 일식·스시","addr":"11806 Jasper Ave NW, Edmonton","phone":"780-760-1616","open":"11:30","close":"21:30","lat":53.5384,"lng":-113.5284,"rating":4.5,"note":"주청사 12분","price":"$$","lunchOk":true,"hasPrivate":false,"vip":true,"parking":{"type":"none","detail":"전용 주차 없음. Jasper Ave 노상유료 또는 Impark."},"desc":"에드먼턴 최고 일식 비스트로. 랍스터 우동·창작 스시. 점심 벤토 $20~.","img":"https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&q=70"},{"id":"dorinku","name":"Dorinku Osaka","icon":"🍱","cat":"japanese","cuisine":"이자카야·스시","addr":"10328 Jasper Ave NW, Edmonton","phone":"780-244-6588","open":"11:30","close":"21:30","lat":53.5445,"lng":-113.4944,"rating":4.5,"note":"주청사 10분","price":"$$","lunchOk":true,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"전용 없음. 인근 Impark·EasyPark 유료(도보 3~5분)."},"desc":"오사카 테마 이자카야. 시크릿 프라이빗룸. 오코노미야키·카츠산도·스시.","img":"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70"},{"id":"mikado","name":"Mikado Downtown","icon":"🍣","cat":"japanese","cuisine":"스시·일식","addr":"10350 109 St NW, Edmonton","phone":"780-425-8490","open":"11:30","close":"21:00","lat":53.546,"lng":-113.5075,"rating":4.6,"note":"주청사 5분","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 없음. 109 St 노상유료 또는 Impark."},"desc":"★4.6 에드먼턴 스시 1위. 점심 특선 세트. 주청사 5분.","img":"https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70"},{"id":"izakaya","name":"Izakaya Tomo","icon":"🍶","cat":"japanese","cuisine":"이자카야","addr":"3739 99 St NW, Edmonton","phone":"780-440-9152","open":"17:00","close":"22:00","lat":53.503,"lng":-113.5017,"rating":4.4,"note":"Whyte Ave","price":"$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"street","detail":"건물 앞 소규모 무료 주차 + 99 St 노상."},"desc":"에드먼턴 최초 이자카야. 타코야키·사시미·타타키. 저녁 전용.","img":"https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=70"},{"id":"jinya","name":"JINYA Ramen Bar","icon":"🍜","cat":"japanese","cuisine":"일본 라멘","addr":"10037 109 St NW, Edmonton","phone":"780-249-6658","open":"11:30","close":"22:00","lat":53.5461,"lng":-113.5073,"rating":4.3,"note":"주청사 5분","price":"$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 없음. 인근 유료 노상 또는 Impark."},"desc":"20시간 돼지뼈 육수. 다운타운 도보권. 라멘+사이드 $20~.","img":"https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70"},{"id":"lingnan","name":"The Lingnan (1947)","icon":"🥢","cat":"chinese","cuisine":"중식 파인다이닝","addr":"10582 104 St NW, Edmonton","phone":"780-426-3975","open":"16:30","close":"21:00","lat":53.5442,"lng":-113.5007,"rating":4.3,"note":"주청사 5분","price":"$$","lunchOk":false,"hasPrivate":false,"vip":false,"parking":{"type":"none","detail":"전용 없음. 104 St 노상유료(시간제). Impark 이용 권장."},"desc":"1947년 창업 최장수 중식당. 격식 있는 중식 코스. 저녁 전용.","img":"https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70"},{"id":"ruths","name":"Ruth\'s Chris Steak","icon":"🥩","cat":"western","cuisine":"아메리칸 스테이크","addr":"9990 Jasper Ave NW, Edmonton","phone":"780-420-0091","open":"11:30","close":"22:00","lat":53.5441,"lng":-113.4896,"rating":4.4,"note":"주청사 8분","price":"$$","lunchOk":true,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"건물 Impark 지하 유료. Jasper Ave 노상유료. 발렛 없음."},"desc":"프라이빗룸 5개(최대 60명). Premium Vault·Boardroom. USDA Prime 시즐링.","img":"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=70"},{"id":"sorrento","name":"Sorrentino\'s","icon":"🇮🇹","cat":"western","cuisine":"이탈리안","addr":"10162 100 St NW, Edmonton","phone":"780-424-7500","open":"11:30","close":"22:00","lat":53.5424,"lng":-113.5001,"rating":4.3,"note":"주청사 10분","price":"$$","lunchOk":true,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"전용 없음. 100 St 인근 Impark 유료."},"desc":"Telus Room·Maurizio Room 프라이빗룸. 코퍼릿 런치. 랍스터 스파게티.","img":"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70"},{"id":"butternut","name":"The Butternut Tree","icon":"🌰","cat":"western","cuisine":"캐나다 파인다이닝","addr":"9707 110 St NW #101, Edmonton","phone":"780-760-2271","open":"17:00","close":"22:00","lat":53.536,"lng":-113.5125,"rating":4.5,"note":"주청사 2분","price":"$$$","lunchOk":false,"hasPrivate":true,"vip":true,"parking":{"type":"paid","detail":"지하 Impark Lot#477 유료(높이 6\'1\\" 제한). 뒤편 Lot#371도 가능."},"desc":"주청사 2분. 리버밸리 파노라마뷰. Top 셰프 Scott Downey. 저녁 전용.","img":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=70"},{"id":"sawmill","name":"Sawmill Leduc","icon":"🥩","cat":"western","cuisine":"스테이크","addr":"5221 Discovery Way, Leduc, AB","phone":"780-612-4001","open":"11:00","close":"22:00","lat":53.2686,"lng":-113.5437,"rating":4.3,"note":"공항 10분","price":"$$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"전용 대형 무료 주차장. 공항 픽업 직후 최적."},"desc":"공항 가장 근접. Alberta beef 스테이크.","img":"https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=70"},{"id":"keg","name":"The Keg Windermere","icon":"🥩","cat":"western","cuisine":"스테이크·해산물","addr":"6104 Andrews Gate SW, Edmonton","phone":"780-989-6160","open":"11:30","close":"22:00","lat":53.4232,"lng":-113.5851,"rating":4.3,"note":"공항 15분","price":"$$","lunchOk":true,"hasPrivate":false,"vip":false,"parking":{"type":"free","detail":"Windermere 쇼핑몰 전용 대형 무료 주차."},"desc":"캐나다 프리미엄 스테이크. 공항→시내 경로 상.","img":"https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70"}],"cafes":[{"id":"stopgap","name":"Stopgap Coffee","icon":"☕","type":"스페셜티 헤리티지","addr":"9749 111 St NW, Edmonton","open":"07:30","close":"15:00","closedDays":[0,1],"lat":53.5355,"lng":-113.5118,"note":"주청사 도보 10분","parking":{"type":"street","detail":"111 St 노상무료(2시간). 건물 앞 소수 공간."},"desc":"헤리티지 벽돌 건물. 리버밸리뷰 도보 5분. 비즈니스 미팅 최적.","img":"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&q=70"},{"id":"district","name":"District Café","icon":"🥐","type":"브런치·카페","addr":"10160 116 St NW, Edmonton","open":"08:00","close":"16:00","closedDays":[],"lat":53.5497,"lng":-113.5232,"note":"주청사 5분","parking":{"type":"street","detail":"116 St 노상주차 가능. 주거지역 비교적 여유."},"desc":"주청사 인근 비즈니스 카페. 시나몬번·샌드위치.","img":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&q=70"},{"id":"credo","name":"Credo Coffee","icon":"☕","type":"로컬 로스터","addr":"10359 82 Ave NW, Edmonton","open":"07:00","close":"18:00","closedDays":[],"lat":53.5203,"lng":-113.4959,"note":"Whyte Ave","parking":{"type":"street","detail":"82 Ave 노상주차. 평일 낮 여유."},"desc":"에드먼턴 로컬 로스터. 자연광 미니멀 인테리어.","img":"https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70"},{"id":"transcend","name":"Transcend Coffee","icon":"✨","type":"스페셜티 #1","addr":"8708 109 St NW, Edmonton","open":"07:00","close":"19:00","closedDays":[],"lat":53.5247,"lng":-113.5056,"note":"Garneau","parking":{"type":"street","detail":"Garneau 주거지역 노상무료."},"desc":"에드먼턴 #1 스페셜티 로스터. 싱글오리진 pour-over.","img":"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=70"},{"id":"iconoclast","name":"Iconoclast Coffee","icon":"⚗️","type":"온사이트 로스터","addr":"10407 Jasper Ave NW, Edmonton","open":"07:30","close":"17:00","closedDays":[],"lat":53.5458,"lng":-113.4913,"note":"다운타운","parking":{"type":"paid","detail":"전용 없음. 인근 Impark 유료."},"desc":"다운타운 온사이트 로스팅. 뉴욕 감성.","img":"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=70"}],"addrBook":[{"id":"wcp","icon":"🏢","name":"Western Canadian Place","addr":"707 8th Ave SW, Calgary, AB","phone":"403-202-7577","note":"사무실"},{"id":"pk1","icon":"📦","name":"픽업① Spruce Place","addr":"1104-99 Spruce Pl SW, Calgary","phone":"","note":"08:20"},{"id":"pk2","icon":"📦","name":"픽업② Riverfront Ave","addr":"222 Riverfront Ave SW, Calgary","phone":"","note":"08:40"},{"id":"legis","icon":"🏛️","name":"앨버타 주청사","addr":"10800 97 Ave NW, Edmonton, AB","phone":"","note":"West Entrance만"},{"id":"qeii","icon":"🏛️","name":"QEII 빌딩(에너지부)","addr":"9820 107 St NW, Edmonton, AB","phone":"","note":"West Entrance"},{"id":"yeg","icon":"✈️","name":"YEG 에드먼턴 공항","addr":"1000 Airport Rd, Leduc, AB","phone":"780-890-8900","note":"Door 7·8 픽업"},{"id":"a1784778989445","icon":"📍","name":"정진환 차장","addr":"99 Spruce Place sw, calgary t3c 3x7","phone":"4038804797","note":"자택"},{"id":"a1784779076099","icon":"📍","name":"서정우 법인장님","addr":"222  Riverfront Ave. SW, Calgary T2P 0W3","phone":"4038753296","note":"자택"},{"id":"a1784781161544","icon":"📍","name":"High Level Bridge Streetcar","addr":"Edmonton","phone":"","note":""}],"savedAt":"2026-07-23T04:35:50.212Z"}');}catch(e){}
-// ═══════════════════════ INIT ═══════════════════════',inject+'\n// ═══════════════════════ INIT ═══════════════════════');
+  // Collect all current data
+  var data={
+    S:S, stops:stops, restaurants:restaurants,
+    cafes:cafes, addrBook:addrBook,
+    lockData:localStorage.getItem(LOCK_KEY)||null,
+    savedAt:new Date().toISOString()
+  };
+
+  // Get the clean source HTML (not current DOM which has display:none states)
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET',location.href,false);
+  try{xhr.send();}catch(e){}
+
+  var html;
+  if(xhr.status===200){
+    html=xhr.responseText;
+  } else {
+    // Fallback: use outerHTML but fix display states
+    html=document.documentElement.outerHTML;
+    // Reset lock/app display states for fresh open
+    html=html.replace('id="lock-screen" class="lock-screen"','id="lock-screen" class="lock-screen" data-exported="1"');
+    html=html.replace('id="main-app" style="display:none"','id="main-app" style="display:none" data-exported="1"');
   }
-  var blob=new Blob([html],{type:'text/html'});
+
+  // Embed data as a JS variable (JSON - no escape issues)
+  var jsonData=JSON.stringify(data);
+  var dataScript='</head>',dataScript+'</head>');
+
+  // Remove any previous exported data
+  html=html.replace(/</head>',dataScript+'</head>');
+
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url; a.download='boss_guide_saved.html'; a.click();
-  URL.revokeObjectURL(url);
+  a.href=url;a.download='boss_guide_saved.html';a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
   showToast('📥 파일 다운로드 완료!');
 }
-
 // Toast notification
 function showToast(msg){
   var t=document.getElementById('toast');
@@ -1541,9 +1606,9 @@ setTimeout(function(){
     lockState._restoreMsg='📂 저장된 데이터 복원 ('+ts+')';
   }
   // Start lock screen
+  bindTabs();
   initLock();
 },150);
 </script>
-
-
-<div id="toast" style="position: fixed; bottom: calc(var(--tab-h) + var(--safe-bot) + 16px); left: 50%; transform: translateX(-50%); background: rgba(20, 30, 50, 0.96); color: rgb(240, 244, 255); padding: 11px 20px; border-radius: 14px; font-size: 13px; font-weight: 600; z-index: 999; pointer-events: none; white-space: nowrap; backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); transition: opacity 0.3s; opacity: 0;">📂 저장된 데이터 복원 (7/22 22:33)</div></body></html>
+</body>
+</html>
