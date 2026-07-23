@@ -62,11 +62,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-top:1px solid var(--border2);
   padding-bottom:var(--safe-bot);
-  flex-shrink:0;z-index:50;
+  flex-shrink:0;z-index:20;
   display:flex;
-  position:relative;
 }
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;position:relative;min-height:var(--tab-h);border:none;background:none;-webkit-appearance:none;appearance:none;outline:none;font-family:inherit;}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;position:relative;min-height:var(--tab-h);}
 .tab-item:active{opacity:.7;}
 .tab-icon{font-size:22px;line-height:1;margin-bottom:3px;transition:transform .15s;}
 .tab-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.2px;}
@@ -514,32 +513,32 @@ select.fi option{background:var(--bg2);color:var(--text);}
 </div>
 
 <!-- TAB BAR -->
-<div class="tabs" id="tab-bar-wrap">
-  <button class="tab-item active" id="tab-schedule" data-page="schedule">
+<div class="tabs">
+  <div class="tab-item active" id="tab-schedule" onclick="showPage('schedule')">
     <div class="tab-icon">📋</div>
     <div class="tab-label">일정</div>
     <div class="tab-dot"></div>
-  </button>
-  <button class="tab-item" id="tab-rest" data-page="rest">
+  </div>
+  <div class="tab-item" id="tab-rest" onclick="showPage('rest')">
     <div class="tab-icon">🍽️</div>
     <div class="tab-label">식당</div>
     <div class="tab-dot"></div>
-  </button>
-  <button class="tab-item" id="tab-cafe" data-page="cafe">
+  </div>
+  <div class="tab-item" id="tab-cafe" onclick="showPage('cafe')">
     <div class="tab-icon">☕</div>
     <div class="tab-label">카페</div>
     <div class="tab-dot"></div>
-  </button>
-  <button class="tab-item" id="tab-map" data-page="map">
+  </div>
+  <div class="tab-item" id="tab-map" onclick="showPage('map')">
     <div class="tab-icon">🗺️</div>
     <div class="tab-label">지도</div>
     <div class="tab-dot"></div>
-  </button>
-  <button class="tab-item" id="tab-addr" data-page="addr">
+  </div>
+  <div class="tab-item" id="tab-addr" onclick="showPage('addr')">
     <div class="tab-icon">📌</div>
     <div class="tab-label">주소록</div>
     <div class="tab-dot"></div>
-  </button>
+  </div>
 </div>
 
 </div><!-- .app -->
@@ -670,28 +669,28 @@ select.fi option{background:var(--bg2);color:var(--text);}
 <script>
 // ═══════════════ DATA ═══════════════
 var IMGS={
-  zigle:'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400',
-  baekjeong:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400',
-  hanjan:'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400',
-  sang:'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400',
-  dookbaeki:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400',
-  japonais:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=400',
-  dorinku:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400',
-  mikado:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400',
-  izakaya:'https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400',
-  jinya:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400',
-  lingnan:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400',
-  ruths:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400',
-  sorrento:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400',
-  butternut:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400',
-  sawmill:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400',
-  keg:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400',
-  stopgap:'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400',
-  district:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400',
-  credo:'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400',
-  transcend:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400',
-  iconoclast:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400'
-}
+  zigle:'https://images.unsplash.com/photo-1529543544282-ea669407fca3?w=400&q=70',
+  baekjeong:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70',
+  hanjan:'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=400&q=70',
+  sang:'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&q=70',
+  dookbaeki:'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=70',
+  japonais:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=400&q=70',
+  dorinku:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70',
+  mikado:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70',
+  izakaya:'https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=70',
+  jinya:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=400&q=70',
+  lingnan:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=400&q=70',
+  ruths:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=70',
+  sorrento:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=70',
+  butternut:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=70',
+  sawmill:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&q=70',
+  keg:'https://images.unsplash.com/photo-1544025162-d76694265947?w=400&q=70',
+  stopgap:'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&q=70',
+  district:'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=400&q=70',
+  credo:'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70',
+  transcend:'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=70',
+  iconoclast:'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=70'
+};
 
 var restaurants=[
   {id:'zigle',name:'ZIGLE Korean Bulgogi',icon:'🍖',cat:'korean',cuisine:'한식 불고기',addr:'800 Broadmoor Blvd #900, Sherwood Park',phone:'825-967-1140',open:'11:30',close:'21:00',lat:53.5381,lng:-113.3212,rating:4.9,note:'공항 15분',price:'$$',lunchOk:true,hasPrivate:false,vip:false,parking:{type:'free',detail:'쇼핑몰 단지 내 대형 무료 주차장. 매우 편리.'},desc:'찌글이 원조. 에드먼턴 최고 평점(★4.9). iPad 주문. 불고기·짜글이·솥밥.',img:IMGS.zigle},
@@ -710,7 +709,7 @@ var restaurants=[
   {id:'butternut',name:'The Butternut Tree',icon:'🌰',cat:'western',cuisine:'캐나다 파인다이닝',addr:'9707 110 St NW #101, Edmonton',phone:'780-760-2271',open:'17:00',close:'22:00',lat:53.5360,lng:-113.5125,rating:4.5,note:'주청사 2분',price:'$$$$$',lunchOk:false,hasPrivate:true,vip:true,parking:{type:'paid',detail:'지하 Impark Lot#477 유료(높이 6\'1" 제한). 뒤편 Lot#371도 가능.'},desc:'주청사 2분. 리버밸리 파노라마뷰. Top 셰프 Scott Downey. 저녁 전용.',img:IMGS.butternut},
   {id:'sawmill',name:'Sawmill Leduc',icon:'🥩',cat:'western',cuisine:'스테이크',addr:'5221 Discovery Way, Leduc, AB',phone:'780-612-4001',open:'11:00',close:'22:00',lat:53.2686,lng:-113.5437,rating:4.3,note:'공항 10분',price:'$$$',lunchOk:true,hasPrivate:false,vip:false,parking:{type:'free',detail:'전용 대형 무료 주차장. 공항 픽업 직후 최적.'},desc:'공항 가장 근접. Alberta beef 스테이크.',img:IMGS.sawmill},
   {id:'keg',name:'The Keg Windermere',icon:'🥩',cat:'western',cuisine:'스테이크·해산물',addr:'6104 Andrews Gate SW, Edmonton',phone:'780-989-6160',open:'11:30',close:'22:00',lat:53.4232,lng:-113.5851,rating:4.3,note:'공항 15분',price:'$$$',lunchOk:true,hasPrivate:false,vip:false,parking:{type:'free',detail:'Windermere 쇼핑몰 전용 대형 무료 주차.'},desc:'캐나다 프리미엄 스테이크. 공항→시내 경로 상.',img:IMGS.keg}
-]
+];
 
 var cafes=[
   {id:'stopgap',name:'Stopgap Coffee',icon:'☕',type:'스페셜티 헤리티지',addr:'9749 111 St NW, Edmonton',open:'07:30',close:'15:00',closedDays:[0,1],lat:53.5355,lng:-113.5118,note:'주청사 도보 10분',parking:{type:'street',detail:'111 St 노상무료(2시간). 건물 앞 소수 공간.'},desc:'헤리티지 벽돌 건물. 리버밸리뷰 도보 5분. 비즈니스 미팅 최적.',img:IMGS.stopgap},
@@ -718,7 +717,7 @@ var cafes=[
   {id:'credo',name:'Credo Coffee',icon:'☕',type:'로컬 로스터',addr:'10359 82 Ave NW, Edmonton',open:'07:00',close:'18:00',closedDays:[],lat:53.5203,lng:-113.4959,note:'Whyte Ave',parking:{type:'street',detail:'82 Ave 노상주차. 평일 낮 여유.'},desc:'에드먼턴 로컬 로스터. 자연광 미니멀 인테리어.',img:IMGS.credo},
   {id:'transcend',name:'Transcend Coffee',icon:'✨',type:'스페셜티 #1',addr:'8708 109 St NW, Edmonton',open:'07:00',close:'19:00',closedDays:[],lat:53.5247,lng:-113.5056,note:'Garneau',parking:{type:'street',detail:'Garneau 주거지역 노상무료.'},desc:'에드먼턴 #1 스페셜티 로스터. 싱글오리진 pour-over.',img:IMGS.transcend},
   {id:'iconoclast',name:'Iconoclast Coffee',icon:'⚗️',type:'온사이트 로스터',addr:'10407 Jasper Ave NW, Edmonton',open:'07:30',close:'17:00',closedDays:[],lat:53.5458,lng:-113.4913,note:'다운타운',parking:{type:'paid',detail:'전용 없음. 인근 Impark 유료.'},desc:'다운타운 온사이트 로스팅. 뉴욕 감성.',img:IMGS.iconoclast}
-]
+];
 
 var addrBook=[
   {id:'wcp',icon:'🏢',name:'Western Canadian Place',addr:'707 8th Ave SW, Calgary, AB',phone:'403-202-7577',note:'사무실'},
@@ -727,13 +726,13 @@ var addrBook=[
   {id:'legis',icon:'🏛️',name:'앨버타 주청사',addr:'10800 97 Ave NW, Edmonton, AB',phone:'',note:'West Entrance만'},
   {id:'qeii',icon:'🏛️',name:'QEII 빌딩(에너지부)',addr:'9820 107 St NW, Edmonton, AB',phone:'',note:'West Entrance'},
   {id:'yeg',icon:'✈️',name:'YEG 에드먼턴 공항',addr:'1000 Airport Rd, Leduc, AB',phone:'780-890-8900',note:'Door 7·8 픽업'}
-]
+];
 
 var HWY2=[
   {name:'Okotoks Tim Hortons',icon:'☕',lat:50.7264,lng:-113.9733,km:'~40km'},
   {name:'Red Deer Gas Alley',icon:'⛽',lat:52.2690,lng:-113.8158,km:'~150km'},
   {name:'Leduc Costco',icon:'🛒',lat:53.2601,lng:-113.5499,km:'~280km'}
-]
+];
 
 // ═══════════════════════ STATE ═══════════════════════
 var S={
@@ -750,7 +749,7 @@ var stops=[
   {id:'cafe',name:'카페',icon:'☕',type:'cafe',dur:20,lat:53.535,lng:-113.512,color:'#f39c12',addr:'미선택'},
   {id:'legis',name:'앨버타 주청사',icon:'🏛️',type:'legis',dur:90,lat:53.5334,lng:-113.5066,color:'#9b59b6',addr:'10800 97 Ave NW, Edmonton, AB'},
   {id:'ret',name:'YEG 귀환',icon:'✈️',type:'return',dur:0,lat:53.3027,lng:-113.5769,color:'#e74c3c',addr:'1000 Airport Rd, Leduc, AB'}
-]
+];
 
 // ═══════════════════════ UTILS ═══════════════════════
 function fmt(h,m){return String(Math.floor(h)%24).padStart(2,'0')+':'+String(Math.round(m)%60).padStart(2,'0');}
@@ -1226,26 +1225,10 @@ var curPage='schedule';
 function showPage(p){
   document.querySelectorAll('.page').forEach(function(el){el.classList.remove('active');});
   document.querySelectorAll('.tab-item').forEach(function(el){el.classList.remove('active');});
-  var pg=document.getElementById('page-'+p);
-  var tb=document.getElementById('tab-'+p);
-  if(pg)pg.classList.add('active');
-  if(tb)tb.classList.add('active');
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tab-'+p).classList.add('active');
   curPage=p;
-  if(p==='map'&&leafletMap){setTimeout(function(){leafletMap.invalidateSize();},200);}
-}
-
-function bindTabs(){
-  var tabWrap=document.getElementById('tab-bar-wrap');
-  if(!tabWrap)return;
-  tabWrap.addEventListener('click',function(e){
-    var btn=e.target.closest('[data-page]');
-    if(btn)showPage(btn.dataset.page);
-  });
-  // iOS Safari touchend fallback
-  tabWrap.addEventListener('touchend',function(e){
-    var btn=e.target.closest('[data-page]');
-    if(btn){e.preventDefault();showPage(btn.dataset.page);}
-  },{passive:false});
+  if(p==='map'&&leafletMap){setTimeout(function(){leafletMap.invalidateSize();},150);}
 }
 
 // ═══════════════════════ SHEETS ═══════════════════════
@@ -1477,26 +1460,6 @@ function saveAll(){
 }
 
 function loadAll(){
-  // If this is an exported file with embedded data, load it first
-  if(window.__EXPORTED__){
-    try{
-      var ed=window.__EXPORTED__;
-      if(ed.S)Object.assign(S,ed.S);
-      if(ed.stops)stops=ed.stops;
-      if(ed.restaurants)restaurants=ed.restaurants;
-      if(ed.cafes)cafes=ed.cafes;
-      if(ed.addrBook)addrBook=ed.addrBook;
-      // Restore lock data if present
-      if(ed.lockData)localStorage.setItem(LOCK_KEY,ed.lockData);
-      // Save to local localStorage for future use
-      localStorage.setItem(SAVE_KEY,JSON.stringify({
-        S:ed.S,stops:ed.stops,restaurants:ed.restaurants,
-        cafes:ed.cafes,addrBook:ed.addrBook,savedAt:ed.savedAt
-      }));
-      window.__EXPORTED__=null; // consume once
-      return ed.savedAt||true;
-    }catch(e){console.warn('Exported data restore failed:',e);}
-  }
   try{
     var raw=localStorage.getItem(SAVE_KEY);
     if(!raw)return false;
@@ -1518,44 +1481,23 @@ function clearSave(){
 
 // HTML 파일로 내보내기 (현재 상태가 기본값으로 박힌 파일 다운로드)
 function exportHTML(){
-  // Collect all current data
-  var data={
-    S:S, stops:stops, restaurants:restaurants,
-    cafes:cafes, addrBook:addrBook,
-    lockData:localStorage.getItem(LOCK_KEY)||null,
-    savedAt:new Date().toISOString()
-  };
-
-  // Get the clean source HTML (not current DOM which has display:none states)
-  var xhr=new XMLHttpRequest();
-  xhr.open('GET',location.href,false);
-  try{xhr.send();}catch(e){}
-
-  var html;
-  if(xhr.status===200){
-    html=xhr.responseText;
-  } else {
-    // Fallback: use outerHTML but fix display states
-    html=document.documentElement.outerHTML;
-    // Reset lock/app display states for fresh open
-    html=html.replace('id="lock-screen" class="lock-screen"','id="lock-screen" class="lock-screen" data-exported="1"');
-    html=html.replace('id="main-app" style="display:none"','id="main-app" style="display:none" data-exported="1"');
+  var data={S:S,stops:stops,restaurants:restaurants,cafes:cafes,addrBook:addrBook,savedAt:new Date().toISOString()};
+  var html=document.documentElement.outerHTML;
+  // inject saved data before the INIT section
+  var inject='/* INJECTED SAVE */\ntry{localStorage.setItem("'+SAVE_KEY+'",\''+JSON.stringify(data).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n')+'\');}catch(e){}';
+  html=html.replace('/* INJECTED SAVE */',inject);
+  // if no placeholder yet, inject before INIT
+  if(html.indexOf('/* INJECTED SAVE */')>=0){
+    html=html.replace('// ═══════════════════════ INIT ═══════════════════════',inject+'\n// ═══════════════════════ INIT ═══════════════════════');
   }
-
-  // Embed data as a JS variable (JSON - no escape issues)
-  var jsonData=JSON.stringify(data);
-  var dataScript='</head>',dataScript+'</head>');
-
-  // Remove any previous exported data
-  html=html.replace(/</head>',dataScript+'</head>');
-
-  var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  var blob=new Blob([html],{type:'text/html'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url;a.download='boss_guide_saved.html';a.click();
-  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  a.href=url; a.download='boss_guide_saved.html'; a.click();
+  URL.revokeObjectURL(url);
   showToast('📥 파일 다운로드 완료!');
 }
+
 // Toast notification
 function showToast(msg){
   var t=document.getElementById('toast');
@@ -1606,7 +1548,6 @@ setTimeout(function(){
     lockState._restoreMsg='📂 저장된 데이터 복원 ('+ts+')';
   }
   // Start lock screen
-  bindTabs();
   initLock();
 },150);
 </script>
