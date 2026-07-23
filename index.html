@@ -111,10 +111,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .tl-time{font-size:11px;color:var(--text3);font-weight:600;margin-bottom:2px;}
 .tl-name{font-size:14px;font-weight:700;color:var(--text);}
 .tl-sub{font-size:11px;color:var(--text2);margin-top:2px;}
-.tl-actions{display:flex;flex-direction:column;gap:4px;padding:4px 0 4px 8px;justify-content:center;}
-.tl-act{width:30px;height:30px;border-radius:8px;border:1px solid var(--border2);background:var(--card2);color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.tl-actions{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px 0 4px 6px;align-content:center;}
+.tl-act{width:28px;height:28px;border-radius:7px;border:1px solid var(--border2);background:var(--card2);color:var(--text2);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .tl-act:active{background:var(--bg3);}
-.tl-drag{color:var(--text3);font-size:18px;padding:0 6px;align-self:center;cursor:grab;user-select:none;}
 
 /* ── Restaurant Cards ── */
 .rest-scroll{display:flex;gap:10px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch;}
@@ -779,12 +778,25 @@ function recalc(){
     times[st.id]=fmt(arr.h,arr.m);cur=addMin(arr.h,arr.m,st.dur);
   }
   S.sched=times;
-  // Sync coords
+  // Sync coords — auto-restore stop if deleted but selection still active
   var sr=restaurants.filter(function(x){return x.id===S.restId;})[0];
   var rs=stops.filter(function(x){return x.type==='restaurant';})[0];
+  if(sr&&!rs){
+    // re-insert before legis (or before last stop)
+    var ins=stops.length-1;
+    for(var ri=0;ri<stops.length;ri++){if(stops[ri].type==='legis'){ins=ri;break;}}
+    stops.splice(ins,0,{id:'rest',name:sr.name,icon:'🍽️',type:'restaurant',dur:90,lat:sr.lat,lng:sr.lng,color:'#2ecc71',addr:sr.addr});
+    rs=stops.filter(function(x){return x.type==='restaurant';})[0];
+  }
   if(sr&&rs){rs.lat=sr.lat;rs.lng=sr.lng;rs.name=sr.name;rs.addr=sr.addr;}
   var sc=cafes.filter(function(x){return x.id===S.cafeId;})[0];
   var cs=stops.filter(function(x){return x.type==='cafe';})[0];
+  if(sc&&!cs){
+    var ins2=stops.length-1;
+    for(var ci=0;ci<stops.length;ci++){if(stops[ci].type==='legis'){ins2=ci;break;}}
+    stops.splice(ins2,0,{id:'cafe',name:sc.name,icon:'☕',type:'cafe',dur:20,lat:sc.lat,lng:sc.lng,color:'#f39c12',addr:sc.addr});
+    cs=stops.filter(function(x){return x.type==='cafe';})[0];
+  }
   if(sc&&cs){cs.lat=sc.lat;cs.lng=sc.lng;cs.name=sc.name;cs.addr=sc.addr;}
   var ds=stops.filter(function(x){return x.type==='depart';})[0];
   if(ds){ds.name=S.transport==='flight'?'YYC 공항 출발':(S.carFrom||'캘거리 출발');ds.icon=S.transport==='flight'?'✈️':'🚗';}
@@ -812,35 +824,32 @@ function updateFooterChips(){
 }
 
 // ═══════════════════════ TIMELINE ═══════════════════════
-var dragIdx=null;
+function moveStop(idx,dir){
+  var ni=idx+dir;
+  if(ni<0||ni>=stops.length)return;
+  var tmp=stops[idx];stops[idx]=stops[ni];stops[ni]=tmp;
+  recalc();
+}
 function renderTimeline(){
   var el=document.getElementById('rt-list');el.innerHTML='';
   for(var i=0;i<stops.length;i++){
     (function(idx,st){
-      var time=S.sched[st.id]||'—';
+      var time=S.sched[st.id]||'--';
       var item=document.createElement('div');item.className='tl-item';
-      item.draggable=true;
-      item.addEventListener('dragstart',function(){dragIdx=idx;setTimeout(function(){item.classList.add('dragging');},0);});
-      item.addEventListener('dragend',function(){item.classList.remove('dragging');});
-      item.addEventListener('dragover',function(e){e.preventDefault();item.classList.add('drag-over');});
-      item.addEventListener('dragleave',function(){item.classList.remove('drag-over');});
-      item.addEventListener('drop',function(e){
-        e.preventDefault();item.classList.remove('drag-over');
-        if(dragIdx===null||dragIdx===idx)return;
-        var mv=stops.splice(dragIdx,1)[0];stops.splice(idx,0,mv);dragIdx=null;recalc();
-      });
       var conn=idx<stops.length-1?'<div class="tl-line" style="background:'+st.color+'40"></div>':'';
+      var canMove=st.type!=='depart'&&st.type!=='arrive'&&st.type!=='return';
+      var upBtn=canMove&&idx>1?'<button class="tl-act" onclick="moveStop('+idx+',-1)" style="font-size:11px">▲</button>':'<div class="tl-act" style="opacity:0;pointer-events:none"></div>';
+      var dnBtn=canMove&&idx<stops.length-2?'<button class="tl-act" onclick="moveStop('+idx+',1)" style="font-size:11px">▼</button>':'<div class="tl-act" style="opacity:0;pointer-events:none"></div>';
       item.innerHTML='<div class="tl-col"><div class="tl-dot" style="background:'+st.color+';box-shadow:0 0 0 3px '+st.color+'30"></div>'+conn+'</div>'
         +'<div class="tl-body" onclick="stepTapped('+idx+')">'
         +'<div class="tl-time">'+time+'</div>'
         +'<div class="tl-name">'+st.icon+' '+st.name+'</div>'
         +(st.addr&&st.addr!=='미선택'?'<div class="tl-sub">'+st.addr.split(',')[0]+'</div>':'')
         +'</div>'
-        +'<div class="tl-actions">'
+        +'<div class="tl-actions">'+upBtn+dnBtn
         +'<button class="tl-act" onclick="openEditStop(\''+st.id+'\')">✏️</button>'
         +'<button class="tl-act" onclick="removeStop(\''+st.id+'\')" style="color:var(--red)">✕</button>'
-        +'</div>'
-        +'<span class="tl-drag">⠿</span>';
+        +'</div>';
       el.appendChild(item);
     })(i,stops[i]);
   }
@@ -858,8 +867,11 @@ function stepTapped(idx){
 }
 
 function removeStop(id){
+  var st=stops.filter(function(s){return s.id===id;})[0];
+  if(st&&st.type==='restaurant'){S.restId=null;}
+  if(st&&st.type==='cafe'){S.cafeId=null;}
   stops=stops.filter(function(s){return s.id!==id;});
-  if(S.restId===id)S.restId=null;if(S.cafeId===id)S.cafeId=null;recalc();
+  recalc();
 }
 
 function openEditStop(id){
@@ -949,7 +961,7 @@ function renderRestPage(){
     if(r.vip)badges+='<span class="badge b-vip">👑VIP</span>';
     if(r.parking)badges+='<span class="badge '+parkCls(r.parking)+'">'+parkLbl(r.parking)+'</span>';
     card.innerHTML=imgH+'<div class="rest-body"><div class="rest-name">'+r.name+'</div><div class="rest-cuisine">'+r.cuisine+' '+r.price+'</div>'+statusH+'<div class="rest-badges">'+badges+'</div></div>';
-    card.onclick=(function(rid){return function(){S.restId=rid;var r2=restaurants.filter(function(x){return x.id===rid;})[0];var rs=stops.filter(function(x){return x.type==='restaurant';})[0];if(r2&&rs){rs.lat=r2.lat;rs.lng=r2.lng;rs.name=r2.name;rs.addr=r2.addr;}recalc();};})(r.id);
+    card.onclick=(function(rid){return function(){S.restId=rid;recalc();};})(r.id);
     // Long-press to delete
     var pt;card.addEventListener('touchstart',function(){pt=setTimeout(function(){if(confirm(r.name+' 삭제?')){delRest(r.id);}},700);},{passive:true});
     card.addEventListener('touchend',function(){clearTimeout(pt);});
@@ -1004,7 +1016,7 @@ function renderCafePage(){
     card.innerHTML=imgH+'<div class="cafe-body-m"><div class="cafe-name-m">'+c.name+'</div><div class="cafe-type-m">'+c.type+'</div>'
       +'<div class="cafe-status-m" style="color:'+(open?'var(--green)':'var(--amber)')+'">'+( open?'✅ '+c.open:('⚠️ '+c.open))+'</div>'
       +'<div class="cafe-status-m" style="margin-top:2px">'+parkLbl(c.parking)+'</div></div>';
-    card.onclick=(function(cid){return function(){S.cafeId=cid;var c2=cafes.filter(function(x){return x.id===cid;})[0];var cs=stops.filter(function(x){return x.type==='cafe';})[0];if(c2&&cs){cs.lat=c2.lat;cs.lng=c2.lng;cs.name=c2.name;cs.addr=c2.addr;}recalc();};})(c.id);
+    card.onclick=(function(cid){return function(){S.cafeId=cid;recalc();};})(c.id);
     var pt2;card.addEventListener('touchstart',function(){pt2=setTimeout(function(){if(confirm(c.name+' 삭제?')){delCafe(c.id);}},700);},{passive:true});
     card.addEventListener('touchend',function(){clearTimeout(pt2);});
     grid.appendChild(card);
